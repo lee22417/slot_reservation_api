@@ -28,7 +28,6 @@ async function bootstrap() {
 
   const appPort = 3000;
   logger.log('app listen ****** ' + appPort + ' ******');
-  await app.listen(appPort);
 
   await app.listen(process.env.PORT ?? appPort);
 }

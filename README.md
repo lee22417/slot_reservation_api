@@ -26,6 +26,9 @@
 - TypeORM, GraphQL
 - MySQL
 - Swagger
+```
+http://localhost:3000/graphql
+```
 
 ## Project setup
 
