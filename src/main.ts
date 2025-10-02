@@ -9,7 +9,7 @@ const logger = new Logger('MAIN');
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    cors: true
+    cors: true,
   });
 
   app.useGlobalPipes(
@@ -29,7 +29,7 @@ async function bootstrap() {
   const appPort = 3000;
   logger.log('app listen ****** ' + appPort + ' ******');
   await app.listen(appPort);
-  
+
   await app.listen(process.env.PORT ?? appPort);
 }
 
