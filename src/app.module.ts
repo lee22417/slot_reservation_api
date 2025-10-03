@@ -8,7 +8,6 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { AppResolver } from './app.resolver';
-import { UserModule } from './user/user.module';
 import { UserModule } from './api/user/user.module';
 import { PayModule } from './api/pay/pay.module';
 import { StoreModule } from './api/store/store.module';
