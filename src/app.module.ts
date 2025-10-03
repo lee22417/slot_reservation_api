@@ -8,6 +8,12 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { AppResolver } from './app.resolver';
+import { UserModule } from './user/user.module';
+import { UserModule } from './api/user/user.module';
+import { PayModule } from './api/pay/pay.module';
+import { StoreModule } from './api/store/store.module';
+import { SpaceModule } from './api/space/space.module';
+import { ReservationModule } from './api/reservation/reservation.module';
 
 @Module({
   imports: [
@@ -35,6 +41,11 @@ import { AppResolver } from './app.resolver';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema/schema.gql'),
     }),
+    UserModule,
+    PayModule,
+    StoreModule,
+    SpaceModule,
+    ReservationModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
