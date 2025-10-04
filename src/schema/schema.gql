@@ -2,6 +2,59 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type StoreModel {
+  st_id: Int!
+
+  """상점 운영 여부 (0:미운영,1:운영)"""
+  store_status: Int!
+
+  """상점 이름"""
+  store_name: String!
+
+  """상점 연락처"""
+  store_number: String!
+
+  """생성 일자"""
+  created_at: DateTime!
+
+  """수정 일자"""
+  updated_at: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type StoreNoticeModel {
+  """공지사항 ID (PK)"""
+  sno_id: Int!
+
+  """상점 ID (Store PK)"""
+  st_id: Int!
+
+  """공지사항 제목"""
+  notice_title: String!
+
+  """공지사항 내용"""
+  notice_content: String!
+
+  """공지사항 노출 여부 (0:비노출,1:노출)"""
+  notice_is_show: Int!
+
+  """공지사항 생성 일자"""
+  created_at: DateTime!
+}
+
 type Query {
   hello: String!
+
+  """모든 조회"""
+  stores: [StoreModel!]
+
+  """ID를 기준으로 특정 지점 조회"""
+  store(id: Int!): StoreModel
+
+  """ID를 기준으로 특정 지점의 모든 공지사항 조회"""
+  findAllNotice(id: Int!): [StoreNoticeModel!]!
 }
