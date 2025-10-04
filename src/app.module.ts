@@ -13,6 +13,7 @@ import { PayModule } from './api/pay/pay.module';
 import { StoreModule } from './api/store/store.module';
 import { SpaceModule } from './api/space/space.module';
 import { ReservationModule } from './api/reservation/reservation.module';
+import { GstoreModule } from './api/gql/gstore/gstore.module';
 
 @Module({
   imports: [
@@ -39,14 +40,17 @@ import { ReservationModule } from './api/reservation/reservation.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema/schema.gql'),
+      playground: true,
     }),
     UserModule,
     PayModule,
     StoreModule,
     SpaceModule,
     ReservationModule,
+    // graphql
+    GstoreModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
 })
-export class AppModule {}
+export class AppModule { }
