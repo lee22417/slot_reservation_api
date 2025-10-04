@@ -27,7 +27,10 @@
 - MySQL
 - Swagger
 ```
+// graphQL
 http://localhost:3000/graphql
+// swagger
+http://localhost:3000/api
 ```
 
 ## Project setup
