@@ -14,6 +14,7 @@ import { StoreModule } from './api/store/store.module';
 import { SpaceModule } from './api/space/space.module';
 import { ReservationModule } from './api/reservation/reservation.module';
 import { GstoreModule } from './api/gql/gstore/gstore.module';
+import { GspaceModule } from './api/gql/gspace/gspace.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { GstoreModule } from './api/gql/gstore/gstore.module';
     ReservationModule,
     // graphql
     GstoreModule,
+    GspaceModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

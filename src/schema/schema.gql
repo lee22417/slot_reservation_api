@@ -63,6 +63,105 @@ type StoreHolidayModel {
   created_at: DateTime!
 }
 
+type SpaceModel {
+  """공간 ID (PK)"""
+  sp_id: Int!
+
+  """상점 ID (Store PK)"""
+  st_id: Int!
+
+  """공간 운영 여부 (0:미운영,1:운영)"""
+  space_status: Int!
+
+  """공간 표시 순서"""
+  space_order: Int!
+
+  """공간 이름"""
+  space_name: String!
+
+  """공간 사용 시간 (분)"""
+  space_use_minute: Int!
+
+  """공간 가격"""
+  space_price: Float!
+
+  """요금 정책 (FIXED:단일고정요금, PER_PERSON:인원별요금)"""
+  space_price_type: String!
+
+  """공간 최소 인원"""
+  space_min_people: Int!
+
+  """공간 최대 인원"""
+  space_max_people: Int!
+
+  """환불 가능 날짜 (n일전까지)"""
+  space_refundable_day: Int!
+
+  """공간 설명"""
+  space_description: String
+
+  """공간 이미지 URL"""
+  space_image_url: String
+
+  """생성일"""
+  created_at: DateTime!
+
+  """수정일"""
+  updated_at: DateTime!
+}
+
+type SpaceOptionModel {
+  """공간 옵션 ID (PK)"""
+  sop_id: Int!
+
+  """공간 ID (store_space PK)"""
+  sp_id: Int!
+
+  """공간 옵션 사용 여부 (0:미사용,1:사용)"""
+  option_status: Int!
+
+  """옵션 이름"""
+  option_name: String!
+
+  """옵션 가격"""
+  option_price: Float!
+
+  """옵션 설명"""
+  option_description: String
+
+  """생성일"""
+  created_at: DateTime!
+
+  """수정일"""
+  updated_at: DateTime!
+}
+
+type SpaceScheduleModel {
+  """공간 스케줄 ID (PK)"""
+  ssc_id: Int!
+
+  """공간 ID (store_space PK)"""
+  sp_id: Int!
+
+  """요일 (0:일요일 ~ 6:토요일)"""
+  space_day_of_week: Int!
+
+  """운영 시작 시간 (HH:MM)"""
+  space_open_time: String!
+
+  """운영 종료 시간 (HH:MM, 24:00이면 익일 자정)"""
+  space_close_time: String!
+
+  """공간 예약 슬롯 단위(분)"""
+  space_interval_minute: Int!
+
+  """생성일"""
+  created_at: DateTime!
+
+  """수정일"""
+  updated_at: DateTime!
+}
+
 type Query {
   hello: String!
 
@@ -74,4 +173,13 @@ type Query {
 
   """ID를 기준으로 특정 상점의 모든 휴일 조회"""
   storeholidays(id: Int!): [StoreHolidayModel!]!
+
+  """ID를 기준으로 특정 상점 공간 조회"""
+  spaces(id: Int!): [SpaceModel!]
+
+  """ID를 기준으로 특정 공간 옵션 조회"""
+  spaceoptions(id: Int!): [SpaceOptionModel!]
+
+  """ID를 기준으로 특정 공간 스케줄 조회"""
+  spaceschedules(id: Int!): [SpaceScheduleModel!]
 }
