@@ -11,7 +11,7 @@ export class GstoreService {
     private readonly storeRepository: Repository<Store>,
     @InjectRepository(StoreNotice)
     private readonly noticeRepository: Repository<StoreNotice>,
-  ) { }
+  ) {}
 
   async findAll() {
     const [data, total] = await this.storeRepository.findAndCount({

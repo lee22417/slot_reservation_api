@@ -3,6 +3,8 @@ import { Store } from '../../entities/store.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { StoreNotice } from '../../entities/store_notice.entity';
+import { StoreHoliday } from '../../entities/store_holidy.entity';
+import { formatDate } from '../../common/utils/date.util';
 
 @Injectable()
 export class StoreService {
@@ -11,15 +13,12 @@ export class StoreService {
     private readonly storeRepository: Repository<Store>,
     @InjectRepository(StoreNotice)
     private readonly noticeRepository: Repository<StoreNotice>,
-  ) { }
+    @InjectRepository(StoreHoliday)
+    private readonly holidayRepository: Repository<StoreHoliday>,
+  ) {}
 
-  // 모든 지점 조회
-  async findAll(
-    page: number = 1,
-    limit: number = 10,
-    store_status?: number,
-    store_name?: string,
-  ) {
+  // 모든 상점 조회
+  async findAll(page: number = 1, limit: number = 10, store_status?: number, store_name?: string) {
     const where: any = {};
     if (store_name) {
       where.store_name = Like(`%${store_name}%`);
@@ -39,26 +38,36 @@ export class StoreService {
     return { success: true, data, total, page, limit };
   }
 
-  // 특정 지점 정보 조회
-  async findOne(st_id: number) {
-    const data = await this.storeRepository.findOneBy({ st_id: st_id });
-    return { success: true, data };
-  }
+  // 특정 상점 모든 정보 조회
+  async findOne(st_id: number, notice_is_show?: number) {
+    const data: any = { notice: {}, holiday: {} };
 
-  // 특정 지점 공지사항 조회
-  async findAllNotice(st_id: number, notice_is_show?: number) {
-    const where: any = { st_id };
+    // -- 기본 정보 조회
+    data.info = await this.storeRepository.findOneBy({ st_id: st_id });
 
+    // -- 공지사항 조회 (최근 생성 순으로 최대 10개 조회)
+    const notice_where: any = { st_id };
     // notice_is_show가 정의된 경우만 필터링
     if (notice_is_show === 0 || notice_is_show === 1) {
-      where.notice_is_show = notice_is_show;
+      notice_where.notice_is_show = notice_is_show;
     }
 
-    const [data, total] = await this.noticeRepository.findAndCount({
-      where,
-      order: { created_at: 'DESC' }, // 최신 공지사항
+    const [notice_data, notice_total] = await this.noticeRepository.findAndCount({
+      where: notice_where,
+      order: { created_at: 'DESC' },
+      take: 10,
     });
 
-    return { success: true, data, total };
+    // -- 휴일 조회
+    const [holiday_data, holiday_total] = await this.holidayRepository.findAndCount({
+      where: { st_id: st_id },
+      order: { created_at: 'ASC' },
+    });
+
+    data.notice.list = notice_data;
+    data.notice.total = notice_total;
+    data.holiday.list = holiday_data;
+    data.holiday.total = holiday_total;
+    return { success: true, data };
   }
 }

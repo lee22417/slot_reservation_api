@@ -52,9 +52,9 @@ type Query {
   """모든 조회"""
   stores: [StoreModel!]
 
-  """ID를 기준으로 특정 지점 조회"""
+  """ID를 기준으로 특정 상점 조회"""
   store(id: Int!): StoreModel
 
-  """ID를 기준으로 특정 지점의 모든 공지사항 조회"""
-  findAllNotice(id: Int!): [StoreNoticeModel!]!
+  """ID를 기준으로 특정 상점의 모든 공지사항 조회"""
+  storenotices(id: Int!): [StoreNoticeModel!]!
 }

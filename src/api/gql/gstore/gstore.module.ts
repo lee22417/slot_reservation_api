@@ -4,9 +4,10 @@ import { GstoreResolver } from './gstore.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { StoreNotice } from '../../../entities/store_notice.entity';
 import { Store } from '../../../entities/store.entity';
+import { StoreHoliday } from '../../../entities/store_holidy.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Store, StoreNotice])],
+  imports: [TypeOrmModule.forFeature([Store, StoreNotice, StoreHoliday])],
   providers: [GstoreResolver, GstoreService],
 })
-export class GstoreModule { }
+export class GstoreModule {}
