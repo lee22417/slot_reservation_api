@@ -3,7 +3,7 @@ import { Store } from '../../entities/store.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { StoreNotice } from '../../entities/store_notice.entity';
-import { StoreHoliday } from '../../entities/store_holidy.entity';
+import { StoreHoliday } from '../../entities/store_holiday.entity';
 import { formatDate } from '../../common/utils/date.util';
 
 @Injectable()
@@ -18,7 +18,7 @@ export class StoreService {
   ) {}
 
   // 모든 상점 조회
-  async findAll(page: number = 1, limit: number = 10, store_status?: number, store_name?: string) {
+  async findAllStore(page: number = 1, limit: number = 10, store_status?: number, store_name?: string) {
     const where: any = {};
     if (store_name) {
       where.store_name = Like(`%${store_name}%`);
@@ -39,7 +39,7 @@ export class StoreService {
   }
 
   // 특정 상점 모든 정보 조회
-  async findOne(st_id: number, notice_is_show?: number) {
+  async findOneStore(st_id: number, notice_is_show?: number) {
     const data: any = { notice: {}, holiday: {} };
 
     // -- 기본 정보 조회

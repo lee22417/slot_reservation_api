@@ -1,14 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity()
+@Entity('store_notice')
 export class StoreNotice {
   @PrimaryGeneratedColumn()
   sno_id: number;
 
-  @Column({
-    nullable: false,
-    comment: 'store pk',
-  })
+  @Column({ nullable: false, comment: 'store pk' })
   st_id: number;
 
   @Column({ nullable: false, length: 255, comment: '공지사항 제목' })

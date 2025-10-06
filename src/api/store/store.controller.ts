@@ -20,14 +20,14 @@ export class StoreController {
     type: String,
     description: '상점 이름으로 필터링',
   })
-  async findAll(
+  async findAllStore(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('status') status?: number,
     @Query('name') store_name?: string,
   ) {
     const store_status = status !== undefined ? +status : undefined;
-    return await this.storeService.findAll(+page, +limit, store_status, store_name);
+    return await this.storeService.findAllStore(+page, +limit, store_status, store_name);
   }
 
   // 특정 상점 모든 정보 조회
@@ -35,7 +35,7 @@ export class StoreController {
   @ApiOperation({ summary: '특정 상점 조회', description: 'ID를 기준으로 특정 상점의 정보 조회' })
   @ApiParam({ name: 'id', type: Number, description: '조회할 상점 ID' })
   @ApiQuery({ name: 'is_show', required: false, type: Number, description: '공지사항을 노출 여부로 필터링' })
-  findOne(@Param('id') st_id: number, @Query('is_show') notice_is_show?: string) {
+  findOneStore(@Param('id') st_id: number, @Query('is_show') notice_is_show?: string) {
     let filterIsShow: number | undefined;
     if (notice_is_show === '0') {
       filterIsShow = 0;
@@ -43,7 +43,7 @@ export class StoreController {
       filterIsShow = 1;
     }
 
-    const result = this.storeService.findOne(+st_id, filterIsShow);
+    const result = this.storeService.findOneStore(+st_id, filterIsShow);
     return instanceToPlain(result); // Expose() 필드 포함되도록 변환
   }
 }

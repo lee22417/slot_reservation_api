@@ -46,15 +46,32 @@ type StoreNoticeModel {
   created_at: DateTime!
 }
 
+type StoreHolidayModel {
+  """휴일 ID (PK)"""
+  sho_id: Int!
+
+  """상점 ID (Store PK)"""
+  st_id: Int!
+
+  """휴일 일자"""
+  holiday_date: DateTime!
+
+  """휴일 설명"""
+  holiday_description: String!
+
+  """공지사항 생성 일자"""
+  created_at: DateTime!
+}
+
 type Query {
   hello: String!
-
-  """모든 조회"""
-  stores: [StoreModel!]
 
   """ID를 기준으로 특정 상점 조회"""
   store(id: Int!): StoreModel
 
   """ID를 기준으로 특정 상점의 모든 공지사항 조회"""
   storenotices(id: Int!): [StoreNoticeModel!]!
+
+  """ID를 기준으로 특정 상점의 모든 휴일 조회"""
+  storeholidays(id: Int!): [StoreHolidayModel!]!
 }

@@ -1,20 +1,11 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn } from 'typeorm';
 
-@Entity()
+@Entity('store')
 export class Store {
   @PrimaryGeneratedColumn()
   st_id: number;
 
-  @Column({
-    nullable: false,
-    default: 0,
-    comment: '상점 운영 여부 (0:미운영,1:운영)',
-  })
+  @Column({ nullable: false, default: 0, comment: '상점 운영 여부 (0:미운영,1:운영)' })
   store_status: number;
 
   @Column({ nullable: false, length: 30, comment: '상점 이름' })

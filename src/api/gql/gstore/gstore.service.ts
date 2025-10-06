@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { StoreNotice } from '../../../entities/store_notice.entity';
 import { Store } from '../../../entities/store.entity';
-import { Repository } from 'typeorm';
+import { StoreHoliday } from '../../../entities/store_holiday.entity';
 
 @Injectable()
 export class GstoreService {
@@ -11,15 +12,9 @@ export class GstoreService {
     private readonly storeRepository: Repository<Store>,
     @InjectRepository(StoreNotice)
     private readonly noticeRepository: Repository<StoreNotice>,
+    @InjectRepository(StoreHoliday)
+    private readonly holidayRepository: Repository<StoreHoliday>,
   ) {}
-
-  async findAll() {
-    const [data, total] = await this.storeRepository.findAndCount({
-      select: ['st_id', 'store_status', 'store_name'],
-      order: { store_name: 'ASC' }, // 이름 정렬
-    });
-    return data;
-  }
 
   findOne(st_id: number) {
     return this.storeRepository.findOneBy({ st_id: st_id });
@@ -28,6 +23,14 @@ export class GstoreService {
   findAllNotice(st_id: number) {
     return this.noticeRepository.find({
       where: { st_id },
+      order: { created_at: 'ASC' },
+    });
+  }
+
+  findAllHoliday(st_id: number) {
+    return this.holidayRepository.find({
+      where: { st_id },
+      order: { holiday_date: 'ASC' },
     });
   }
 }
