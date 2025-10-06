@@ -1,0 +1,4 @@
+export enum SPACE_PRICE_TYPE {
+  FIXED = 'FIXED',
+  PER_PERSION = 'PER_PERSION',
+}

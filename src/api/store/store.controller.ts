@@ -31,7 +31,7 @@ export class StoreController {
   }
 
   // 특정 상점 모든 정보 조회
-  @Get('/:id')
+  @Get(':id')
   @ApiOperation({ summary: '특정 상점 조회', description: 'ID를 기준으로 특정 상점의 정보 조회' })
   @ApiParam({ name: 'id', type: Number, description: '조회할 상점 ID' })
   @ApiQuery({ name: 'is_show', required: false, type: Number, description: '공지사항을 노출 여부로 필터링' })
@@ -45,5 +45,21 @@ export class StoreController {
 
     const result = this.storeService.findOneStore(+st_id, filterIsShow);
     return instanceToPlain(result); // Expose() 필드 포함되도록 변환
+  }
+
+  // 특정 상점 모든 공간 조회
+  @Get(':id/space')
+  @ApiOperation({ summary: '특정 상점 모든 공간 조회', description: 'ID를 기준으로 특정 상점의 모든 공간 조회' })
+  @ApiParam({ name: 'id', type: Number, description: '조회할 상점 ID' })
+  @ApiQuery({ name: 'status', required: false, type: Number, description: '공간 운영 여부로 필터링 (0:미운영,1:운영)' })
+  findAllSpace(@Param('id') st_id: number, @Query('status') space_status?: string) {
+    let filterStatus: number | undefined;
+    if (space_status === '0') {
+      filterStatus = 0;
+    } else if (space_status === '1') {
+      filterStatus = 1;
+    }
+
+    return this.storeService.findAllSpace(+st_id, filterStatus);
   }
 }

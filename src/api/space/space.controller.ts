@@ -1,34 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { SpaceService } from './space.service';
-import { CreateSpaceDto } from './dto/create-space.dto';
-import { UpdateSpaceDto } from './dto/update-space.dto';
+import { ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 
 @Controller('space')
 export class SpaceController {
   constructor(private readonly spaceService: SpaceService) {}
 
-  @Post()
-  create(@Body() createSpaceDto: CreateSpaceDto) {
-    return this.spaceService.create(createSpaceDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.spaceService.findAll();
-  }
-
+  // 특정 공간 모든 정보 조회
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.spaceService.findOne(+id);
-  }
+  @ApiOperation({ summary: '특정 공간 모든 정보 조회', description: 'ID를 기준으로 특정 공간의 모든 정보 조회' })
+  @ApiParam({ name: 'id', type: Number, description: '조회할 공간 ID' })
+  @ApiQuery({ name: 'status', required: false, type: Number, description: '공간 옵션 사용 여부로 필터링 (0:미사용,1:사용)' })
+  findOneSpace(@Param('id') st_id: number, @Query('status') option_status?: string) {
+    let filterStatus: number | undefined;
+    if (option_status === '0') {
+      filterStatus = 0;
+    } else if (option_status === '1') {
+      filterStatus = 1;
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSpaceDto: UpdateSpaceDto) {
-    return this.spaceService.update(+id, updateSpaceDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.spaceService.remove(+id);
+    return this.spaceService.findOneSpace(+st_id, filterStatus);
   }
 }

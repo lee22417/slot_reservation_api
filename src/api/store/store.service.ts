@@ -5,6 +5,7 @@ import { Like, Repository } from 'typeorm';
 import { StoreNotice } from '../../entities/store_notice.entity';
 import { StoreHoliday } from '../../entities/store_holiday.entity';
 import { formatDate } from '../../common/utils/date.util';
+import { Space } from '../../entities/store_space.entity';
 
 @Injectable()
 export class StoreService {
@@ -15,6 +16,8 @@ export class StoreService {
     private readonly noticeRepository: Repository<StoreNotice>,
     @InjectRepository(StoreHoliday)
     private readonly holidayRepository: Repository<StoreHoliday>,
+    @InjectRepository(Space)
+    private readonly spaceRepository: Repository<Space>,
   ) {}
 
   // 모든 상점 조회
@@ -69,5 +72,20 @@ export class StoreService {
     data.holiday.list = holiday_data;
     data.holiday.total = holiday_total;
     return { success: true, data };
+  }
+
+  // 특정 상점 모든 공간 조회
+  async findAllSpace(st_id: number, space_status?: number) {
+    const where: any = { st_id };
+    if (space_status === 0 || space_status === 1) {
+      where.space_status = space_status;
+    }
+
+    const [data, total] = await this.spaceRepository.findAndCount({
+      where: where,
+      order: { space_order: 'ASC', space_name: 'ASC' },
+    });
+
+    return { success: true, data, total };
   }
 }
