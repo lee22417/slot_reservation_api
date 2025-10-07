@@ -6,6 +6,7 @@ import { StoreNotice } from '../../entities/store_notice.entity';
 import { StoreHoliday } from '../../entities/store_holiday.entity';
 import { formatDate } from '../../common/utils/date.util';
 import { Space } from '../../entities/store_space.entity';
+import { StorePaySetting } from '../../entities/store_pay_setting.entity';
 
 @Injectable()
 export class StoreService {
@@ -16,6 +17,8 @@ export class StoreService {
     private readonly noticeRepository: Repository<StoreNotice>,
     @InjectRepository(StoreHoliday)
     private readonly holidayRepository: Repository<StoreHoliday>,
+    @InjectRepository(StorePaySetting)
+    private readonly paysettingRepository: Repository<StorePaySetting>,
     @InjectRepository(Space)
     private readonly spaceRepository: Repository<Space>,
   ) {}
@@ -46,7 +49,7 @@ export class StoreService {
     const data: any = { notice: {}, holiday: {} };
 
     // -- 기본 정보 조회
-    data.info = await this.storeRepository.findOneBy({ st_id: st_id });
+    data.info = await this.storeRepository.findOneBy({ st_id });
 
     // -- 공지사항 조회 (최근 생성 순으로 최대 10개 조회)
     const notice_where: any = { st_id };
@@ -87,5 +90,11 @@ export class StoreService {
     });
 
     return { success: true, data, total };
+  }
+
+  // 특정 삼정 결제 정보 조회
+  async findOnePaySetting(st_id: number) {
+    const data = await this.paysettingRepository.findOneBy({ st_id });
+    return { success: true, data };
   }
 }

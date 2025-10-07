@@ -1,6 +1,4 @@
-import { Expose } from 'class-transformer';
 import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn } from 'typeorm';
-import { formatDate } from '../common/utils/date.util';
 import { SPACE_PRICE_TYPE } from '../common/constants/enum.constants';
 
 @Entity('store_space')
@@ -11,7 +9,7 @@ export class Space {
   @Column({ nullable: false, comment: 'store pk' })
   st_id: number;
 
-  @Column({ nullable: false, default: 0, comment: '공간 운영 여부 (0:미운영,1:운영)' })
+  @Column({ nullable: false, type: 'tinyint', default: 0, comment: '공간 운영 여부 (0:미운영,1:운영)' })
   space_status: number;
 
   @Column({ nullable: false, default: 1, comment: '공간 표시 순서' })
@@ -53,6 +51,6 @@ export class Space {
   @Column({ default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updated_at: Date;
 }

@@ -62,4 +62,12 @@ export class StoreController {
 
     return this.storeService.findAllSpace(+st_id, filterStatus);
   }
+
+  // 특정 삼정 결제 정보 조회
+  @Get(':id/pay_setting')
+  @ApiOperation({ summary: '특정 삼정 결제 정보 조회', description: 'ID를 기준으로 특정 상점의 결제 정보 조회' })
+  @ApiParam({ name: 'id', type: Number, description: '조회할 상점 ID' })
+  findOnePaySetting(@Param('id') st_id: number) {
+    return this.storeService.findOnePaySetting(+st_id);
+  }
 }

@@ -21,4 +21,13 @@ export class SpaceController {
 
     return this.spaceService.findOneSpace(+st_id, filterStatus);
   }
+
+  // 특정 공간 특정 일자 시간 슬롯 및 예약 여부 조회
+  @Get(':id/slots')
+  @ApiOperation({ summary: '특정 공간 특정 일자 시간 슬롯 및 예약 여부 조회', description: 'ID, 날짜를 기준으로 시간 슬롯 및 예약 여부 조회' })
+  @ApiParam({ name: 'id', type: Number, description: '조회할 공간 ID' })
+  @ApiQuery({ name: 'date', type: Date, description: '검색할 날짜' })
+  findSpaceSlots(@Param('id') st_id: number, @Query('date') date: string) {
+    return this.spaceService.findSpaceSlots(+st_id, date);
+  }
 }

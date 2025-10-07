@@ -1,6 +1,4 @@
-import { Expose } from 'class-transformer';
 import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn } from 'typeorm';
-import { formatDate } from '../common/utils/date.util';
 
 @Entity('store_space_schedule')
 export class SpaceSchedule {
@@ -25,6 +23,6 @@ export class SpaceSchedule {
   @Column({ default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updated_at: Date;
 }
