@@ -1,12 +1,14 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { LoggingInterceptor } from './common/interceptor/log.interceptor';
+import { Logger } from 'nestjs-pino';
 
 //  create glocal Logger instance
-const logger = new Logger('MAIN');
+// const logger = new Logger('MAIN');
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -36,11 +38,17 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document); // http://{host}:{port}/api 로 접근 가능
 
+  // interceptor
+  app.useGlobalInterceptors(new LoggingInterceptor(app.get(Reflector))); // log interceptor
+
+  // pino
+  app.useLogger(app.get(Logger));
+
   app.useStaticAssets(join(__dirname, '..', 'public'));
   // app.setBaseViewsDir(join(__dirname, '..', 'views'));
 
   const appPort = 3000;
-  logger.log('app listen ****** ' + appPort + ' ******');
+  // logger.log('app listen ****** ' + appPort + ' ******');
 
   await app.listen(process.env.PORT ?? appPort);
 }

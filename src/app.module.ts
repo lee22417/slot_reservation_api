@@ -15,6 +15,7 @@ import { SpaceModule } from './api/space/space.module';
 import { ReservationModule } from './api/reservation/reservation.module';
 import { GstoreModule } from './api/gql/gstore/gstore.module';
 import { GspaceModule } from './api/gql/gspace/gspace.module';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
@@ -37,12 +38,26 @@ import { GspaceModule } from './api/gql/gspace/gspace.module';
           synchronize: false,
         };
       },
-    }),
+    }), // typeorm
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema/schema.gql'),
       playground: true,
-    }),
+    }), // graphQL
+    LoggerModule.forRoot({
+      pinoHttp: {
+        level: 'debug',
+        transport: {
+          target: 'pino-pretty',
+          options: {
+            colorize: true,
+            translateTime: 'SYS:standard',
+            ignore: 'res,req',
+            // ignore: 'pid,hostname,context,res,req',
+          },
+        },
+      },
+    }), // pino log
     UserModule,
     PayModule,
     StoreModule,
@@ -55,4 +70,4 @@ import { GspaceModule } from './api/gql/gspace/gspace.module';
   controllers: [AppController],
   providers: [AppService, AppResolver],
 })
-export class AppModule { }
+export class AppModule {}
