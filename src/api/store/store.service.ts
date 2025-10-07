@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { StoreNotice } from '../../entities/store_notice.entity';
 import { StoreHoliday } from '../../entities/store_holiday.entity';
-import { formatDate } from '../../common/utils/date.util';
 import { Space } from '../../entities/store_space.entity';
 import { StorePaySetting } from '../../entities/store_pay_setting.entity';
 
@@ -24,13 +23,13 @@ export class StoreService {
   ) {}
 
   // 모든 상점 조회
-  async findAllStore(page: number = 1, limit: number = 10, store_status?: number, store_name?: string) {
+  async findAllStore(page: number = 1, limit: number = 10, storeStatus?: number, storeName?: string) {
     const where: any = {};
-    if (store_name) {
-      where.store_name = Like(`%${store_name}%`);
+    if (storeName) {
+      where.store_name = Like(`%${storeName}%`);
     }
-    if (store_status === 0 || store_status === 1) {
-      where.store_status = store_status;
+    if (storeStatus === 0 || storeStatus === 1) {
+      where.store_status = storeStatus;
     }
 
     const [data, total] = await this.storeRepository.findAndCount({
@@ -45,43 +44,43 @@ export class StoreService {
   }
 
   // 특정 상점 모든 정보 조회
-  async findOneStore(st_id: number, notice_is_show?: number) {
+  async findOneStore(stId: number, noticeIsShow?: number) {
     const data: any = { notice: {}, holiday: {} };
 
     // -- 기본 정보 조회
-    data.info = await this.storeRepository.findOneBy({ st_id });
+    data.info = await this.storeRepository.findOneBy({ st_id: stId });
 
     // -- 공지사항 조회 (최근 생성 순으로 최대 10개 조회)
-    const notice_where: any = { st_id };
+    const noticeWhere: any = { st_id: stId };
     // notice_is_show가 정의된 경우만 필터링
-    if (notice_is_show === 0 || notice_is_show === 1) {
-      notice_where.notice_is_show = notice_is_show;
+    if (noticeIsShow === 0 || noticeIsShow === 1) {
+      noticeWhere.notice_is_show = noticeIsShow;
     }
 
-    const [notice_data, notice_total] = await this.noticeRepository.findAndCount({
-      where: notice_where,
+    const [noticeData, noticeTotal] = await this.noticeRepository.findAndCount({
+      where: noticeWhere,
       order: { created_at: 'DESC' },
       take: 10,
     });
 
     // -- 휴일 조회
-    const [holiday_data, holiday_total] = await this.holidayRepository.findAndCount({
-      where: { st_id: st_id },
+    const [holidayData, holidayTotal] = await this.holidayRepository.findAndCount({
+      where: { st_id: stId },
       order: { created_at: 'ASC' },
     });
 
-    data.notice.list = notice_data;
-    data.notice.total = notice_total;
-    data.holiday.list = holiday_data;
-    data.holiday.total = holiday_total;
+    data.notice.list = noticeData;
+    data.notice.total = noticeTotal;
+    data.holiday.list = holidayData;
+    data.holiday.total = holidayTotal;
     return { success: true, data };
   }
 
   // 특정 상점 모든 공간 조회
-  async findAllSpace(st_id: number, space_status?: number) {
-    const where: any = { st_id };
-    if (space_status === 0 || space_status === 1) {
-      where.space_status = space_status;
+  async findAllSpace(stId: number, spaceStatus?: number) {
+    const where: any = { st_id: stId };
+    if (spaceStatus === 0 || spaceStatus === 1) {
+      where.space_status = spaceStatus;
     }
 
     const [data, total] = await this.spaceRepository.findAndCount({
@@ -93,8 +92,8 @@ export class StoreService {
   }
 
   // 특정 삼정 결제 정보 조회
-  async findOnePaySetting(st_id: number) {
-    const data = await this.paysettingRepository.findOneBy({ st_id });
+  async findOnePaySetting(stId: number) {
+    const data = await this.paysettingRepository.findOneBy({ st_id: stId });
     return { success: true, data };
   }
 }

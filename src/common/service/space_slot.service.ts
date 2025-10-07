@@ -11,46 +11,46 @@ export class SpaceSlotService {
   ) {}
 
   // 특정 공간, 특정 요일의 시간 슬롯 조회
-  async getSlotsByDay(sp_id: number, target_date: string): Promise<string[]> {
+  async getSlotsByDay(spId: number, targetDate: string): Promise<string[]> {
     const slots: string[] = [];
-    const target_day_of_week = new Date(target_date).getDay(); // 요일
+    const targetDayOfWeek = new Date(targetDate).getDay(); // 요일
 
     // 해당 일자의 요일로 스케줄 조회
     const schedules = await this.scheduleRepository.find({
-      where: { sp_id, space_day_of_week: target_day_of_week },
+      where: { sp_id: spId, space_day_of_week: targetDayOfWeek },
     });
 
     // 각 스케줄별 시간 슬롯 계산
     schedules.forEach((schedule) => {
-      const temp_slots: string[] = this.sliceSlots(schedule.space_open_time, schedule.space_close_time, schedule.space_interval_minute);
-      slots.push(...temp_slots);
+      const tempSlots: string[] = this.sliceSlots(schedule.space_open_time, schedule.space_close_time, schedule.space_interval_minute);
+      slots.push(...tempSlots);
     });
 
     return slots;
   }
 
   // open_time, close_time으로 공간 슬롯 구하기
-  sliceSlots = (open_time: string, close_time: string, interval_minute) => {
+  sliceSlots = (openTime: string, closeTime: string, intervalMinute) => {
     const slots: string[] = [];
 
     // 분단위까지 사용, 초단위 사용 안함
-    const [open_hour, open_minute, open_second] = open_time.split(':').map(Number);
-    const [close_hour, close_minute, close_second] = close_time.split(':').map(Number);
+    const [openHour, openMinute, openSecond] = openTime.split(':').map(Number);
+    const [closeHour, closeMinute, closeSecond] = closeTime.split(':').map(Number);
 
-    const start_minutes = open_hour * 60 + open_minute; // 슬롯 오픈 시간 분으로 변환
-    const end_minutes = close_hour * 60 + close_minute; // 슬롯 종료 시간 분으로 변환
+    const startMinutes = openHour * 60 + openMinute; // 슬롯 오픈 시간 분으로 변환
+    const endMinutes = closeHour * 60 + closeMinute; // 슬롯 종료 시간 분으로 변환
 
     // 총 슬롯수
-    const count = Math.floor((end_minutes - start_minutes) / interval_minute);
+    const count = Math.floor((endMinutes - startMinutes) / intervalMinute);
 
     // 슬롯 계산
     Array.from({ length: count }, (_, i) => {
-      const slot_total_minutes = start_minutes + i * interval_minute;
-      const slot_hour = Math.floor(slot_total_minutes / 60)
+      const slotTotalMinutes = startMinutes + i * intervalMinute;
+      const slotHour = Math.floor(slotTotalMinutes / 60)
         .toString()
         .padStart(2, '0');
-      const slot_minute = (slot_total_minutes % 60).toString().padStart(2, '0');
-      slots.push(`${slot_hour}:${slot_minute}`);
+      const slotMinute = (slotTotalMinutes % 60).toString().padStart(2, '0');
+      slots.push(`${slotHour}:${slotMinute}`);
     });
 
     return slots;

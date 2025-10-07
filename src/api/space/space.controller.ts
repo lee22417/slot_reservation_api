@@ -11,15 +11,15 @@ export class SpaceController {
   @ApiOperation({ summary: '특정 공간 모든 정보 조회', description: 'ID를 기준으로 특정 공간의 모든 정보 조회' })
   @ApiParam({ name: 'id', type: Number, description: '조회할 공간 ID' })
   @ApiQuery({ name: 'status', required: false, type: Number, description: '공간 옵션 사용 여부로 필터링 (0:미사용,1:사용)' })
-  findOneSpace(@Param('id') st_id: number, @Query('status') option_status?: string) {
+  findOneSpace(@Param('id') stId: number, @Query('status') optionStatus?: string) {
     let filterStatus: number | undefined;
-    if (option_status === '0') {
+    if (optionStatus === '0') {
       filterStatus = 0;
-    } else if (option_status === '1') {
+    } else if (optionStatus === '1') {
       filterStatus = 1;
     }
 
-    return this.spaceService.findOneSpace(+st_id, filterStatus);
+    return this.spaceService.findOneSpace(+stId, filterStatus);
   }
 
   // 특정 공간 특정 일자 시간 슬롯 및 예약 여부 조회
@@ -27,7 +27,7 @@ export class SpaceController {
   @ApiOperation({ summary: '특정 공간 특정 일자 시간 슬롯 및 예약 여부 조회', description: 'ID, 날짜를 기준으로 시간 슬롯 및 예약 여부 조회' })
   @ApiParam({ name: 'id', type: Number, description: '조회할 공간 ID' })
   @ApiQuery({ name: 'date', type: Date, description: '검색할 날짜' })
-  findSpaceSlots(@Param('id') st_id: number, @Query('date') date: string) {
-    return this.spaceService.findSpaceSlots(+st_id, date);
+  findSpaceSlots(@Param('id') stId: number, @Query('date') targetDate: string) {
+    return this.spaceService.findSpaceSlots(+stId, targetDate);
   }
 }
