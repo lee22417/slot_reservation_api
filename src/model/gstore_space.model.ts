@@ -1,5 +1,7 @@
-import { ObjectType, Field, Int, Float } from '@nestjs/graphql';
+import { ObjectType, Field, Int, Float, registerEnumType } from '@nestjs/graphql';
 import { SPACE_PRICE_TYPE } from '../common/constants/enum.constants';
+
+registerEnumType(SPACE_PRICE_TYPE, { name: 'SpacePriceType' });
 
 @ObjectType()
 export class SpaceModel {

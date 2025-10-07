@@ -1,4 +1,7 @@
-import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { ObjectType, Field, Int, registerEnumType } from '@nestjs/graphql';
+import { RESERVATION_STATUS } from '../common/constants/enum.constants';
+
+registerEnumType(RESERVATION_STATUS, { name: 'ReservationStatus' });
 
 @ObjectType({ description: '예약 정보 엔티티' })
 export class ReservationModel {
@@ -14,7 +17,7 @@ export class ReservationModel {
   @Field(() => String, {
     description: '상태 (OCCUPIED: 임시 점유, PENDING: 대기, COMPLETED: 완료, CANCELED: 취소)',
   })
-  status: 'OCCUPIED' | 'PENDING' | 'COMPLETED' | 'CANCELED';
+  status: RESERVATION_STATUS;
 
   @Field(() => Date, { description: '예약 시작 일시' })
   start_datetime: Date;

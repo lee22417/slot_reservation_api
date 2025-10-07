@@ -6,11 +6,11 @@ export class Reservation {
   @PrimaryGeneratedColumn({ unsigned: true })
   re_id: number;
 
+  @Column({ nullable: false, length: 100, comment: '결제 고유 번호' })
+  payment_id: string;
+
   @Column({ nullable: false, type: 'int', comment: 'store_space pk' })
   sp_id: number;
-
-  @Column({ nullable: false, type: 'int', comment: 'pay pk' })
-  pa_id: number;
 
   @Column({
     nullable: false,
