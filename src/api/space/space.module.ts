@@ -9,10 +9,11 @@ import { Reservation } from '../../entities/reservation.entity';
 import { Store } from '../../entities/store.entity';
 import { StoreHoliday } from '../../entities/store_holiday.entity';
 import { SpaceStatusService } from '../../common/service/space_status.service';
+import { SpaceSlotService } from '../../common/service/space_slot.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Store, StoreHoliday, Space, SpaceOption, SpaceSchedule, Reservation])],
   controllers: [SpaceController],
-  providers: [SpaceService, SpaceStatusService],
+  providers: [SpaceService, SpaceStatusService, SpaceSlotService],
 })
 export class SpaceModule {}

@@ -10,6 +10,7 @@ import { RESERVATION_STATUS } from '../../common/constants/enum.constants';
 import { Store } from '../../entities/store.entity';
 import { StoreHoliday } from '../../entities/store_holiday.entity';
 import { SpaceStatusService } from '../../common/service/space_status.service';
+import { SpaceSlotService } from '../../common/service/space_slot.service';
 
 @Injectable()
 export class SpaceService {
@@ -27,6 +28,7 @@ export class SpaceService {
     @InjectRepository(Reservation)
     private readonly reservationRepository: Repository<Reservation>,
     private readonly spaceStatusService: SpaceStatusService,
+    private readonly spaceSlotServicce: SpaceSlotService,
   ) {}
 
   // 특정 공간 모든 정보 조회
@@ -57,8 +59,6 @@ export class SpaceService {
   // 특정 공간 특정 일자 시간 슬롯 조회
   async findSpaceSlots(sp_id: number, target_date: string) {
     const now = new Date();
-    const slots: string[] = []; // 시간 슬롯
-    const target_day_of_week = new Date(target_date).getDay(); // 요일
 
     // 해당 일자 운영 여부 조회
     const status_result = await this.spaceStatusService.checkSpaceStatus(sp_id, target_date);
@@ -66,14 +66,8 @@ export class SpaceService {
       return status_result;
     }
 
-    // 해당 일자의 요일로 스케줄 조회 (여러개 조회 가능 (예: 11:00~13:00, 14:00~18:00))
-    const schedule = await this.scheduleRepository.find({ where: { sp_id, space_day_of_week: target_day_of_week } });
-
-    // 해당 일자 시간 슬롯 구하기
-    schedule.map((x) => {
-      const temp_slots: string[] = sliceSlots(x.space_open_time, x.space_close_time, x.space_interval_minute);
-      slots.push(...temp_slots);
-    });
+    // 시간 슬롯 구하기
+    const slots = await this.spaceSlotServicce.getSlotsByDay(sp_id, target_date);
 
     // 해당 일자 예약 조회
     const next_date = new Date(new Date(target_date));
@@ -118,7 +112,6 @@ export class SpaceService {
       return { time: x, reservation: status };
     });
 
-    const data = { info: schedule, slot_info };
-    return { success: true, data };
+    return { success: true, data: slot_info };
   }
 }
