@@ -22,10 +22,12 @@
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
 ## Description
-- NestJS, typescript 
-- TypeORM, GraphQL
+
+- NestJS, typescript
 - MySQL
-- Swagger
+- TypeORM, GraphQL
+- Swagger, pino
+
 ```
 // graphQL
 http://localhost:3000/graphql
