@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import * as fs from 'fs';
 import path from 'path';
@@ -56,39 +56,35 @@ export class LogPinoService {
 
     const logs: any[] = []; // 출력 및 저장되는 로그
 
-    // tag에 따라 로그 출력 및 배열에 저장
-    const logEntryExtra = (level: 'debug' | 'info' | 'error', extra?: object) => {
-      let finalExtra = { ...extra };
-      // DB 관련
-      if (options.tag === 'db' && options.rowCount !== undefined) {
-        // slow query 감지
-        let isSlow = false;
-        if (options.duration && options.duration > SLOW_QUERY_THRESHOLD) {
-          isSlow = true;
-        }
-        finalExtra = { ...finalExtra, rowCount: options.rowCount, isSlow };
-      }
-      // api 관련
-      if (options.tag === 'api' && options.statusCode !== undefined) {
-        finalExtra = { ...finalExtra, statusCode: options.statusCode, payload: options.payload };
-      }
-      // 캐시 관련
-      if (options.tag === 'cache') {
-        finalExtra = { ...finalExtra, hit: options.hit, size: options.size };
-      }
-
-      // 로그 배열에 저장
-      const entryExtra = { timestamp: new Date().toISOString(), target: targetName, method: methodName, message: options.tag, ...finalExtra };
-      logs.push(entryExtra);
-      this.pinoLogger[level](entryExtra); // 로그 출력
-    };
-
     // 로그 출력 및 배열에 저장
     const logEntry = (level: 'debug' | 'info' | 'error', message: string, extra?: object) => {
       // 로그 배열에 저장
       const entry = { timestamp: new Date().toISOString(), target: targetName, method: methodName, message, ...extra };
       logs.push(entry); // 파일에 저장할 로그
       this.pinoLogger[level](entry); // 로그 출력
+    };
+
+    // tag에 따라 로그 출력 및 배열에 저장
+    const logEntryExtra = (level: 'debug' | 'info' | 'error') => {
+      const extra: any = {};
+      // DB 관련
+      if (options.tag === 'db' && options.rowCount !== undefined) {
+        extra.rowCount = options.rowCount; // 쿼리 row 수
+        extra.isSlow = options.duration !== undefined && options.duration >= SLOW_QUERY_THRESHOLD; // slow query 여부
+      }
+      // api 관련
+      if (options.tag === 'api' && options.statusCode !== undefined) {
+        extra.statusCode = options.statusCode; // 응답 코드
+        extra.payload = options.payload; // payload
+      }
+      // 캐시 관련
+      if (options.tag === 'cache') {
+        extra.hit = options.hit; // hit/miss 여부
+        extra.size = options.size; // payload 크기 (byte)
+        extra.ttl = options.ttl; // TTL (유효시간)
+      }
+
+      logEntry(level, options.tag ?? 'execution', extra);
     };
 
     if (options.startEnd) {
@@ -111,7 +107,7 @@ export class LogPinoService {
       const endTime = new Date();
       const endPerf = performance.now();
       const memoryEnd = process.memoryUsage().heapUsed;
-      options.duration = endPerf - startPerf;
+      options.duration = endPerf - startPerf; // 전체 실행 시간
 
       if (options.startEnd) {
         // method 실행 종료 시간

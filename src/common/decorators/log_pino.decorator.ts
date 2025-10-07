@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
@@ -15,32 +14,27 @@ export function createLogPinoDecorator(defaultOptions: LogPinoOptions) {
 
       // DB, API, Cache 등 tag별 실행 결과를 options에 반영
       const enhancedOptions: LogPinoOptions = { ...defaultOptions };
+      const result = await originalMethod.apply(this, args);
 
       // DB 전용: 실행 결과 row 수
       if (enhancedOptions.tag === 'db') {
-        const result = await originalMethod.apply(this, args);
         enhancedOptions.rowCount = Array.isArray(result) ? result.length : 1; // 쿼리 row 수
-        return service.logMethod(target.constructor.name, propertyKey, async () => result, enhancedOptions);
       }
 
       // API 전용: 응답 statusCode 기록
       if (enhancedOptions.tag === 'api') {
-        const result = await originalMethod.apply(this, args);
         enhancedOptions.statusCode = result?.status || 0; // 응답 코드
         enhancedOptions.payload = result?.data ?? result ?? null; // payload (result.data가 있으면 사용, 없으면 result 전체)
-        return service.logMethod(target.constructor.name, propertyKey, async () => result, enhancedOptions);
       }
 
       // Cache 전용: hit 여부 및 payload 크기 기록
       if (enhancedOptions.tag === 'cache') {
-        const result = await originalMethod.apply(this, args);
         enhancedOptions.hit = result !== null && result !== undefined; // hit/miss 여부
         enhancedOptions.size = result ? JSON.stringify(result).length : 0; // payload 크기 (byte)
         enhancedOptions.ttl = result?.ttl ?? null; // TTL (유효시간)
-        return service.logMethod(target.constructor.name, propertyKey, async () => result, enhancedOptions);
       }
 
-      // 일반 execution
+      // 로그 콘솔 출력 및 파일 기록
       return service.logMethod(target.constructor.name, propertyKey, () => originalMethod.apply(this, args), enhancedOptions);
     };
 
