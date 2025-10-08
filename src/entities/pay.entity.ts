@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { PayMethod, PayStatus } from '../common/constants/enum.constants';
+import { PAY_METHOD, PAY_STATUS } from '../common/constants/enum.constants';
 
 @Entity({ name: 'pay' })
 export class Pay {
@@ -21,15 +21,19 @@ export class Pay {
   @Column({ nullable: false, type: 'int', comment: '총 가격' })
   pay_total_price: number;
 
-  @Column({ nullable: false, type: 'enum', enum: PayStatus, comment: '결제 상태 (결제 대기, 완료, 취소)' })
-  pay_status: PayStatus;
+  @Column({ nullable: false, type: 'enum', enum: PAY_STATUS, comment: '결제 상태 (결제 대기, 완료, 취소)' })
+  pay_status: PAY_STATUS;
 
-  @Column({ nullable: false, type: 'enum', enum: PayMethod, comment: '결제 수단' })
-  pay_method: PayMethod;
+  @Column({ nullable: false, type: 'enum', enum: PAY_METHOD, comment: '결제 수단' })
+  pay_method: PAY_METHOD;
 
   @CreateDateColumn({ type: 'datetime', comment: '생성일' })
   created_at: Date;
 
   @UpdateDateColumn({ type: 'timestamp', comment: '수정일', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updated_at: Date;
+
+  constructor(partial?: Partial<Pay>) {
+    Object.assign(this, partial);
+  }
 }

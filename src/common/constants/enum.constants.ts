@@ -1,7 +1,7 @@
 // space.price_type
 export enum SPACE_PRICE_TYPE {
   FIXED = 'FIXED',
-  PER_PERSION = 'PER_PERSION',
+  PER_PERSON = 'PER_PERSON',
 }
 
 // reservation.status
@@ -13,14 +13,14 @@ export enum RESERVATION_STATUS {
 }
 
 // pay.pay_status
-export enum PayStatus {
+export enum PAY_STATUS {
   PENDING = 'PENDING', // 결제 대기
   COMPLETED = 'COMPLETED', // 결제 완료
   CANCELED = 'CANCELED', // 취소
 }
 
 // pay.pay_method
-export enum PayMethod {
+export enum PAY_METHOD {
   CARD = 'CARD',
   CASH = 'CASH',
   FREE = 'FREE',

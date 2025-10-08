@@ -5,12 +5,12 @@ export class ReservationOptionModel {
   @Field(() => Int, { description: 'reservation_option pk' })
   rop_id: number;
 
-  @Field(() => Int, { description: 'reservation pk' })
-  re_id: number;
+  @Field({ description: '결제 고유 번호' })
+  payment_id: string;
 
   @Field(() => Int, { description: 'store_space_option pk' })
   sop_id: number;
 
-  @Field(() => Int, { description: '수량' })
+  @Field(() => Int, { description: '옵션 수량' })
   quantity: number;
 }

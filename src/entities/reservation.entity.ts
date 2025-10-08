@@ -34,4 +34,8 @@ export class Reservation {
 
   @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updated_at: Date;
+
+  constructor(partial?: Partial<Reservation>) {
+    Object.assign(this, partial);
+  }
 }

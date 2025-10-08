@@ -11,7 +11,7 @@ export class SpaceOption {
   @Column({ nullable: false, type: 'tinyint', default: 0, comment: '공간 옵션 사용 여부 (0:미사용,1:사용)' })
   option_status: number;
 
-  @Column({ nullable: false, length: 20, comment: '옵션 이름' })
+  @Column({ nullable: false, length: 30, comment: '옵션 이름' })
   option_name: string;
 
   @Column({ nullable: false, default: 0, comment: '옵션 가격' })
