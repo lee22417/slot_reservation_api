@@ -8,6 +8,7 @@ import { Reservation } from '../../entities/reservation.entity';
 import { RESERVATION_STATUS } from '../../common/constants/enum.constants';
 import { SpaceStatusService } from '../../common/service/space_status.service';
 import { SpaceSlotService } from '../../common/service/space_slot.service';
+import { checkValidReservationStatus } from '../../common/utils/reservation.util';
 
 @Injectable()
 export class SpaceService {
@@ -51,10 +52,8 @@ export class SpaceService {
 
   // 특정 공간 특정 일자 시간 슬롯 조회
   async findSpaceSlots(spId: number, targetDate: string) {
-    const now = new Date();
-
     // 해당 일자 운영 여부 조회
-    const statusResult = await this.spaceStatusService.checkSpaceStatus(spId, targetDate);
+    const statusResult = await this.spaceStatusService.checkSpaceStatus(spId, [targetDate]);
     if (!statusResult || !statusResult.success) {
       return statusResult;
     }
@@ -65,7 +64,7 @@ export class SpaceService {
     // 해당 일자 예약 조회
     const nextDate = new Date(new Date(targetDate));
     nextDate.setDate(nextDate.getDate() + 1);
-    const excludedStatus = ['CANCELED'];
+    const excludedStatus = [RESERVATION_STATUS.CANCELED];
     const reservation: Reservation[] = await this.reservationRepository.find({
       where: {
         sp_id: spId,
@@ -73,35 +72,22 @@ export class SpaceService {
         end_datetime: Raw((alias) => `${alias} >= :targetDate`, { targetDate }),
         status: Raw((alias) => `${alias} NOT IN (:...excludedStatus)`, { excludedStatus }),
       },
+      order: { created_at: 'DESC' },
     });
 
     // 해당 일자 시간 슬롯에 예약 여부 추가
+    const now: Date = new Date();
     const slotInfo = slots.map((x) => {
       const slotStart = new Date(`${targetDate}T${x}:00`);
       const slotEnd = new Date(slotStart);
       slotEnd.setHours(slotEnd.getHours() + 1); // 1시간 슬롯 기준
 
-      // 해당 슬롯에 걸치는 예약 찾기
-      const tempReservation = reservation.find((r) => r.start_datetime < slotEnd && r.end_datetime > slotStart);
+      // 해당 슬롯에 걸치는 예약들 상태 유효한지 확인
+      const tempReservation = reservation
+        .filter((x) => x.start_datetime < slotEnd && x.end_datetime > slotStart)
+        .find((x) => checkValidReservationStatus(x, now) !== null);
 
-      let status = tempReservation ? tempReservation.status : null; // 예약 상태
-
-      // status가 OCCUPIED이면 임시 점유 (created_at) 기준 10분 이내 확인
-      if (status === RESERVATION_STATUS.OCCUPIED && tempReservation) {
-        const diffMinutes = (now.getTime() - tempReservation.created_at.getTime()) / 1000 / 60;
-        if (diffMinutes > 10) {
-          status = null; // 10분 초과면 미예약으로 설정
-        }
-      }
-
-      // status가 PENDING이면 결제 대기 (created_at) 기준 1일 이내 확인
-      if (status === RESERVATION_STATUS.PENDING && tempReservation) {
-        const diffHours = (now.getTime() - tempReservation.created_at.getTime()) / 1000 / 60 / 60; // 시간 단위
-        if (diffHours > 24) {
-          status = null; // 1일 초과면 미예약으로 설정
-        }
-      }
-
+      const status = tempReservation ? tempReservation.status : null;
       return { time: x, reservation: status };
     });
 
