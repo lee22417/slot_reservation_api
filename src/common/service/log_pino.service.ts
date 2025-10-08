@@ -84,7 +84,9 @@ export class LogPinoService {
         extra.ttl = options.ttl; // TTL (유효시간)
       }
 
-      logEntry(level, options.tag ?? 'execution', extra);
+      if (Object.keys(extra).length > 0) {
+        logEntry(level, options.tag ?? 'execution', extra);
+      }
     };
 
     if (options.startEnd) {

@@ -26,6 +26,14 @@ import { LoggerModule } from 'nestjs-pino';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
+        // logging 설정
+        let logging: boolean | ('query' | 'error' | 'schema' | 'warn' | 'info' | 'log' | 'migration')[];
+        if (process.env.NODE_ENV === 'dev') {
+          logging = ['query', 'error'];
+        } else if (process.env.NODE_ENV === 'prod') {
+          logging = ['error'];
+        }
+
         // console.log('DB_PASSWORD:', configService.get<string>('DB_HOST'));
         return {
           type: 'mysql',
@@ -36,6 +44,7 @@ import { LoggerModule } from 'nestjs-pino';
           database: configService.get<string>('DB_DATABASE'),
           entities: [join(__dirname, 'entities', '*.entity.{ts,js}')],
           synchronize: false,
+          logging: ['query', 'error'],
         };
       },
     }), // typeorm
