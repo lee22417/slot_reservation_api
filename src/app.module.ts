@@ -27,7 +27,7 @@ import { LoggerModule } from 'nestjs-pino';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         // logging 설정
-        let logging: boolean | ('query' | 'error' | 'schema' | 'warn' | 'info' | 'log' | 'migration')[];
+        let logging: boolean | ('query' | 'error' | 'schema' | 'warn' | 'info' | 'log' | 'migration')[] = false;
         if (process.env.NODE_ENV === 'dev') {
           logging = ['query', 'error'];
         } else if (process.env.NODE_ENV === 'prod') {
@@ -44,7 +44,7 @@ import { LoggerModule } from 'nestjs-pino';
           database: configService.get<string>('DB_DATABASE'),
           entities: [join(__dirname, 'entities', '*.entity.{ts,js}')],
           synchronize: false,
-          logging: ['query', 'error'],
+          logging: logging,
         };
       },
     }), // typeorm

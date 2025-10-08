@@ -7,9 +7,6 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LoggingInterceptor } from './common/interceptor/log.interceptor';
 import { Logger } from 'nestjs-pino';
 
-//  create glocal Logger instance
-// const logger = new Logger('MAIN');
-
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: true,
@@ -42,15 +39,17 @@ async function bootstrap() {
   app.useGlobalInterceptors(new LoggingInterceptor(app.get(Reflector))); // log interceptor
 
   // pino
-  app.useLogger(app.get(Logger));
+  const logger = app.get(Logger);
+  app.useLogger(logger);
 
   app.useStaticAssets(join(__dirname, '..', 'public'));
   // app.setBaseViewsDir(join(__dirname, '..', 'views'));
 
-  const appPort = 3000;
-  // logger.log('app listen ****** ' + appPort + ' ******');
+  const appPort = process.env.PORT ?? 3000;
+  logger.log('app listen ****** ' + appPort + ' ******');
+  logger.log('env **** ' + process.env.NODE_ENV + ' ****');
 
-  await app.listen(process.env.PORT ?? appPort);
+  await app.listen(appPort);
 }
 
 bootstrap();
