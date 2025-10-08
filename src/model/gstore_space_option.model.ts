@@ -1,6 +1,6 @@
 import { ObjectType, Field, Int, Float } from '@nestjs/graphql';
 
-@ObjectType()
+@ObjectType({ description: '공간 옵션 정보' })
 export class SpaceOptionModel {
   @Field(() => Int, { description: '공간 옵션 ID (PK)' })
   sop_id: number;

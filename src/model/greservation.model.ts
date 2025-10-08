@@ -3,7 +3,7 @@ import { RESERVATION_STATUS } from '../common/constants/enum.constants';
 
 registerEnumType(RESERVATION_STATUS, { name: 'ReservationStatus' });
 
-@ObjectType({ description: '예약 정보 엔티티' })
+@ObjectType({ description: '예약 정보' })
 export class ReservationModel {
   @Field(() => Int, { description: '예약 PK' })
   re_id: number;

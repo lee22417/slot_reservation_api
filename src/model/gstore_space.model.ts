@@ -3,7 +3,7 @@ import { SPACE_PRICE_TYPE } from '../common/constants/enum.constants';
 
 registerEnumType(SPACE_PRICE_TYPE, { name: 'SpacePriceType' });
 
-@ObjectType()
+@ObjectType({ description: '상점 공간 정보' })
 export class SpaceModel {
   @Field(() => Int, { description: '공간 ID (PK)' })
   sp_id: number;

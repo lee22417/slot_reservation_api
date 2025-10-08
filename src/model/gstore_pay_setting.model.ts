@@ -1,6 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 
-@ObjectType()
+@ObjectType({ description: '상점 결제 설정 정보' })
 export class StorePaySettingModel {
   @Field(() => Int)
   sps_id: number;

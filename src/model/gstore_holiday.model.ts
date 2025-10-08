@@ -1,6 +1,6 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 
-@ObjectType()
+@ObjectType({ description: '상점 휴일' })
 export class StoreHolidayModel {
   @Field(() => Int, { description: '휴일 ID (PK)' })
   sho_id: number;
