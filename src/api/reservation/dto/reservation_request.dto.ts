@@ -3,6 +3,7 @@ import { IsString, IsNotEmpty, IsPhoneNumber, IsOptional, IsArray, ValidateNeste
 import { Type } from 'class-transformer';
 import { ReservationRequestOptionDto } from './reservation_request_option.dto';
 import { PAY_METHOD } from '../../../common/constants/enum.constants';
+import { ReservationRequestSlotDto } from './reservation_request_slot.dto';
 
 @InputType()
 export class ReservationRequestDto {
@@ -26,30 +27,17 @@ export class ReservationRequestDto {
   @IsNotEmpty()
   total_people: number;
 
-  @Field({ description: '예약 시작 날짜 (YYYY-MM-DD)' })
-  @IsString()
+  @Field(() => [ReservationRequestSlotDto], { nullable: true, description: '예약 시간 슬롯' })
   @IsNotEmpty()
-  start_date: string;
-
-  @Field({ description: '예약 시작 시간 (HH:mm)' })
-  @IsString()
-  @IsNotEmpty()
-  start_time: string;
-
-  @Field({ description: '예약 종료 날짜 (YYYY-MM-DD)' })
-  @IsString()
-  @IsNotEmpty()
-  end_date: string;
-
-  @Field({ description: '예약 종료 시간 (HH:mm)' })
-  @IsString()
-  @IsNotEmpty()
-  end_time: string;
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ReservationRequestSlotDto)
+  slots: ReservationRequestSlotDto[];
 
   @Field(() => [ReservationRequestOptionDto], { nullable: true, description: '선택 옵션' })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ReservationRequestOptionDto)
-  option?: ReservationRequestOptionDto[];
+  options?: ReservationRequestOptionDto[];
 }
