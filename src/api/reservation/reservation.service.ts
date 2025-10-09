@@ -19,6 +19,7 @@ import { Reservation } from '../../entities/reservation.entity';
 import { SpaceOption } from '../../entities/store_space_option.entity';
 import { combineDateTime } from '../../common/utils/date.util';
 import { ReservationRequestSlotDto } from './dto/reservation_request_slot.dto';
+import { Space } from '../../entities/store_space.entity';
 
 @Injectable()
 export class ReservationService {
@@ -68,6 +69,54 @@ export class ReservationService {
     if (!space) {
       return { success: false, msg: '공간 조회 실패' };
     }
+
+    // 예약 검증, 예약 가능 여부 확인 로직
+    const validReservation = await this.checkValidReservation(spId, totalPeople, payMethod, slots, space);
+    if (!validReservation.success) {
+      return validReservation;
+    }
+
+    // 결제 고유 번호 생성
+    const paymentId: string = await this.paymentIdService.createUniquePaymentId();
+    // 총 시간 슬롯 수
+    const totalSlotCount = slots.reduce((acc, cur) => acc + cur.times.length, 0);
+    // 공간 총 가격 계산 (인원, 시간 슬롯 고려) (옵션 제외)
+    const priceInfo = this.calculateTotalSpacePrice(totalPeople, space.space_price, space.space_price_type, totalSlotCount);
+    // this.logger.debug('priceInfo', { priceInfo: priceInfo });
+
+    // 결제 정보 저장 로직
+    const payResult = await this.savePayLogic(paymentId, payMethod, options, space.space_name, priceInfo.totalPrice, priceInfo.spaceQuantity);
+    if (!payResult?.success) {
+      return payResult;
+    }
+
+    // 예약 정보 저장 로직
+    const reservationResult = await this.saveReservationLogic(
+      spId,
+      paymentId,
+      guestName,
+      guestPhone,
+      totalPeople,
+      space.space_interval_minute,
+      slots,
+      options,
+    );
+    if (!reservationResult?.success) {
+      return reservationResult;
+    }
+
+    return { success: true, data: { payment_id: paymentId } };
+  }
+
+  // --- 내부 함수
+  // 예약 검증, 예약 가능 여부 확인 로직
+  async checkValidReservation(
+    spId: number,
+    totalPeople: number,
+    payMethod: PAY_METHOD,
+    slots: ReservationRequestSlotDto[],
+    space: Space,
+  ): Promise<{ success: boolean; msg?: string }> {
     if (totalPeople < space.space_min_people || totalPeople > space.space_max_people) {
       return { success: false, msg: '인원수가 공간 조건에 불일치' };
     }
@@ -123,41 +172,9 @@ export class ReservationService {
       return { success: false, msg: `해당 결제 수단 사용 불가 [${payMethod}]` };
     }
 
-    // 결제 고유 번호 생성
-    const paymentId: string = await this.paymentIdService.createUniquePaymentId();
-
-    // 총 시간 슬롯 수
-    const totalSlotCount = slots.reduce((acc, cur) => acc + cur.times.length, 0);
-
-    // 공간 총 가격 계산 (인원, 시간 슬롯 고려) (옵션 제외)
-    const priceInfo = this.calculateTotalSpacePrice(totalPeople, space.space_price, space.space_price_type, totalSlotCount);
-    this.logger.debug(priceInfo, { priceInfo: priceInfo });
-
-    // 결제 정보 저장 로직
-    const payResult = await this.savePayLogic(paymentId, payMethod, options, space.space_name, priceInfo.totalPrice, priceInfo.spaceQuantity);
-    if (!payResult?.success) {
-      return payResult;
-    }
-
-    // 예약 정보 저장 로직
-    const reservationResult = await this.saveReservationLogic(
-      spId,
-      paymentId,
-      guestName,
-      guestPhone,
-      totalPeople,
-      space.space_interval_minute,
-      slots,
-      options,
-    );
-    if (!reservationResult?.success) {
-      return reservationResult;
-    }
-
-    return { success: true, data: { payment_id: paymentId } };
+    return { success: true };
   }
 
-  // --- 내부 함수
   // 예약 정보 저장 로직
   async saveReservationLogic(
     spId: number,
