@@ -26,6 +26,9 @@ export class Reservation {
   @Column({ nullable: false, type: 'datetime', comment: '예약 종료 일시' })
   end_datetime: Date;
 
+  @Column({ nullable: false, type: 'int', comment: '예약한 시간 슬롯 수' })
+  slot_count: number;
+
   @Column({ nullable: false, type: 'int', comment: '총 결제 인원' })
   total_people: number;
 

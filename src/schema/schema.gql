@@ -2,6 +2,7 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""상점 정보"""
 type StoreModel {
   st_id: Int!
 
@@ -26,6 +27,7 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+"""상점 공지사항"""
 type StoreNoticeModel {
   """공지사항 ID (PK)"""
   sno_id: Int!
@@ -46,6 +48,7 @@ type StoreNoticeModel {
   created_at: DateTime!
 }
 
+"""상점 휴일"""
 type StoreHolidayModel {
   """휴일 ID (PK)"""
   sho_id: Int!
@@ -63,6 +66,7 @@ type StoreHolidayModel {
   created_at: DateTime!
 }
 
+"""상점 공간 정보"""
 type SpaceModel {
   """공간 ID (PK)"""
   sp_id: Int!
@@ -81,6 +85,9 @@ type SpaceModel {
 
   """공간 사용 시간 (분)"""
   space_use_minute: Int!
+
+  """공간 예약 슬롯 단위(분)"""
+  space_interval_minute: Int!
 
   """공간 가격"""
   space_price: Float!
@@ -110,6 +117,7 @@ type SpaceModel {
   updated_at: DateTime!
 }
 
+"""공간 옵션 정보"""
 type SpaceOptionModel {
   """공간 옵션 ID (PK)"""
   sop_id: Int!
@@ -136,6 +144,7 @@ type SpaceOptionModel {
   updated_at: DateTime!
 }
 
+"""상점 공간 스케줄"""
 type SpaceScheduleModel {
   """공간 스케줄 ID (PK)"""
   ssc_id: Int!
@@ -151,9 +160,6 @@ type SpaceScheduleModel {
 
   """운영 종료 시간 (HH:MM, 24:00이면 익일 자정)"""
   space_close_time: String!
-
-  """공간 예약 슬롯 단위(분)"""
-  space_interval_minute: Int!
 
   """생성일"""
   created_at: DateTime!

@@ -22,7 +22,7 @@ export class PayModel {
   @Field(() => Int, { nullable: true, description: '유저 포인트 PK' })
   po_id?: number;
 
-  @Field(() => Int, { description: '총 결제 금액' })
+  @Field(() => Int, { description: '총 결제 가격' })
   pay_total_price: number;
 
   @Field(() => PAY_STATUS, { description: '결제 상태 (결제 대기, 완료, 취소)' })

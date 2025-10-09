@@ -11,7 +11,7 @@ export class SpaceSlotService {
   ) {}
 
   // 특정 공간, 특정 요일의 시간 슬롯 조회
-  async getSlotsByDay(spId: number, targetDate: string): Promise<string[]> {
+  async getSlotsByDay(spId: number, targetDate: string, intervalMinute: number): Promise<{ slots: string[] }> {
     const slots: string[] = [];
     const targetDayOfWeek = new Date(targetDate).getDay(); // 요일
 
@@ -22,15 +22,15 @@ export class SpaceSlotService {
 
     // 각 스케줄별 시간 슬롯 계산
     schedules.forEach((schedule) => {
-      const tempSlots: string[] = this.sliceSlots(schedule.space_open_time, schedule.space_close_time, schedule.space_interval_minute);
+      const tempSlots: string[] = this.sliceSlots(schedule.space_open_time, schedule.space_close_time, intervalMinute);
       slots.push(...tempSlots);
     });
 
-    return slots;
+    return { slots };
   }
 
   // open_time, close_time으로 공간 슬롯 구하기
-  sliceSlots = (openTime: string, closeTime: string, intervalMinute) => {
+  sliceSlots = (openTime: string, closeTime: string, intervalMinute: number) => {
     const slots: string[] = [];
 
     // 분단위까지 사용, 초단위 사용 안함

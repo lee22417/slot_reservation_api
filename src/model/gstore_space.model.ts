@@ -23,6 +23,9 @@ export class SpaceModel {
   @Field(() => Int, { description: '공간 사용 시간 (분)' })
   space_use_minute: number;
 
+  @Field(() => Int, { description: '공간 예약 슬롯 단위(분)' })
+  space_interval_minute: number;
+
   @Field(() => Float, { description: '공간 가격' })
   space_price: number;
 

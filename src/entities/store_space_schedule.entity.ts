@@ -17,9 +17,6 @@ export class SpaceSchedule {
   @Column({ nullable: false, comment: '운영 종료 시간 (HH:mm) (24:00 이면 익일 자정)' })
   space_close_time: string;
 
-  @Column({ nullable: false, comment: '공간 예약 슬롯 단위(분)' })
-  space_interval_minute: number;
-
   @Column({ default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 

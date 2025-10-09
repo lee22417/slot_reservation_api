@@ -17,9 +17,6 @@ export class SpaceScheduleModel {
   @Field({ description: '운영 종료 시간 (HH:MM, 24:00이면 익일 자정)' })
   space_close_time: string;
 
-  @Field(() => Int, { description: '공간 예약 슬롯 단위(분)' })
-  space_interval_minute: number;
-
   @Field(() => Date, { description: '생성일' })
   created_at: Date;
 

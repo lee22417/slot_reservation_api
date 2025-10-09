@@ -11,8 +11,8 @@ export class PayDetailModel {
   @Field({ description: '구매 아이템 이름' })
   item_name: string;
 
-  @Field(() => Int, { description: '구매 아이템 가격' })
-  item_price: number;
+  @Field(() => Int, { description: '구매 아이템 총 가격 (수량,인원,시간 슬롯 모두 고려)' })
+  item_total_price: number;
 
   @Field(() => Int, { description: '구매 아이템 수량' })
   item_quantity: number;

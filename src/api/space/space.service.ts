@@ -30,7 +30,7 @@ export class SpaceService {
     const data: any = { option: {}, schedule: {} };
     data.info = await this.spaceRepository.findOneBy({ sp_id: spId });
 
-    // -- 공간 옵션 조회
+    // 공간 옵션 조회
     const optionWhere: any = { sp_id: spId };
     // option_status가 정의된 경우만 필터링
     if (optionStatus === 0 || optionStatus === 1) {
@@ -41,7 +41,7 @@ export class SpaceService {
       order: { option_name: 'ASC' },
     });
 
-    // -- 공간 스케줄 조회
+    // 공간 스케줄 조회
     const schedule = await this.scheduleRepository.find({ where: { sp_id: spId }, order: { space_day_of_week: 'ASC' } });
 
     data.option.list = optionData;
@@ -57,9 +57,14 @@ export class SpaceService {
     if (!statusResult || !statusResult.success) {
       return statusResult;
     }
+    // 공간 조회
+    const space = statusResult.space;
+    if (!space) {
+      return { success: false, msg: '공간 조회 실패' };
+    }
 
     // 시간 슬롯 구하기
-    const slots = await this.spaceSlotServicce.getSlotsByDay(spId, targetDate);
+    const slotsInfo = await this.spaceSlotServicce.getSlotsByDay(spId, targetDate, space.space_interval_minute);
 
     // 해당 일자 예약 조회
     const nextDate = new Date(new Date(targetDate));
@@ -77,10 +82,10 @@ export class SpaceService {
 
     // 해당 일자 시간 슬롯에 예약 여부 추가
     const now: Date = new Date();
-    const slotInfo = slots.map((x) => {
+    const slots = slotsInfo.slots.map((x) => {
       const slotStart = new Date(`${targetDate}T${x}:00`);
       const slotEnd = new Date(slotStart);
-      slotEnd.setHours(slotEnd.getHours() + 1); // 1시간 슬롯 기준
+      slotEnd.setMinutes(slotEnd.getMinutes() + space.space_interval_minute);
 
       // 해당 슬롯에 걸치는 예약들 상태 유효한지 확인
       const tempReservation = reservation
@@ -91,6 +96,6 @@ export class SpaceService {
       return { time: x, reservation: status };
     });
 
-    return { success: true, data: slotInfo };
+    return { success: true, data: slots };
   }
 }

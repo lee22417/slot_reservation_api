@@ -25,6 +25,9 @@ export class ReservationModel {
   @Field(() => Date, { description: '예약 종료 일시' })
   end_datetime: Date;
 
+  @Field(() => Int, { description: '예약한 시간 슬롯 수' })
+  slot_count: number;
+
   @Field(() => Int, { description: '총 결제 인원 수' })
   total_people: number;
 
