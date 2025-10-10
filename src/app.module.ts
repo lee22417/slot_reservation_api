@@ -9,19 +9,19 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { AppResolver } from './app.resolver';
 import { UserModule } from './api/user/user.module';
-import { PayModule } from './api/pay/pay.module';
 import { StoreModule } from './api/store/store.module';
 import { SpaceModule } from './api/space/space.module';
-import { ReservationModule } from './api/reservation/reservation.module';
+import { ReservationGuestModule } from './api/reservation_guest/reservation_guest.module';
 import { GstoreModule } from './api/gql/gstore/gstore.module';
 import { GspaceModule } from './api/gql/gspace/gspace.module';
 import { LoggerModule } from 'nestjs-pino';
+import { PayGuestModule } from './api/pay_guest/pay_guest.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-    }),
+    }), // typeorm
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -34,7 +34,6 @@ import { LoggerModule } from 'nestjs-pino';
           logging = ['error'];
         }
 
-        // console.log('DB_PASSWORD:', configService.get<string>('DB_HOST'));
         return {
           type: 'mysql',
           host: configService.get<string>('DB_HOST'),
@@ -44,15 +43,16 @@ import { LoggerModule } from 'nestjs-pino';
           database: configService.get<string>('DB_DATABASE'),
           entities: [join(__dirname, 'entities', '*.entity.{ts,js}')],
           synchronize: false,
+          name: 'default', // default connection 설정
           logging: logging,
         };
       },
-    }), // typeorm
+    }), // graphQL
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema/schema.gql'),
       playground: true,
-    }), // graphQL
+    }), // pino log
     LoggerModule.forRoot({
       pinoHttp: {
         level: 'debug',
@@ -66,12 +66,12 @@ import { LoggerModule } from 'nestjs-pino';
           },
         },
       },
-    }), // pino log
+    }),
     UserModule,
-    PayModule,
     StoreModule,
     SpaceModule,
-    ReservationModule,
+    ReservationGuestModule,
+    PayGuestModule,
     // graphql
     GstoreModule,
     GspaceModule,

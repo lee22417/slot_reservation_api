@@ -35,6 +35,13 @@ http://localhost:3000/graphql
 http://localhost:3000/api
 ```
 
+- 개선
+  ```
+  트랜젝션 (typeorm-transactional-cls-hooked)
+  실 결제 서비스 (inicis, kis, toss, ...)
+  sms 서비스 (문자, 카카오톡)
+  ```
+
 ## Project setup
 
 ```bash

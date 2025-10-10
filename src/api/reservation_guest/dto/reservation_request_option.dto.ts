@@ -1,5 +1,5 @@
 import { InputType, Field, Int } from '@nestjs/graphql';
-import { IsInt, IsOptional, Min } from 'class-validator';
+import { IsInt, Min } from 'class-validator';
 
 @InputType()
 export class ReservationRequestOptionDto {

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ReservationService } from './reservation.service';
-import { ReservationController } from './reservation.controller';
+import { ReservationGuestService } from './reservation_guest.service';
+import { ReservationGuestController } from './reservation_guest.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Reservation } from '../../entities/reservation.entity';
 import { Space } from '../../entities/store_space.entity';
@@ -17,6 +17,7 @@ import { ReservationGuest } from '../../entities/reservation_guest.entity';
 import { ReservationOption } from '../../entities/reservation_option.entity';
 import { PayDetail } from '../../entities/pay_detail.entity';
 import { StorePaySetting } from '../../entities/store_pay_setting.entity';
+import { PayReservationStatusService } from '../../common/service/pay_reservation_status.service';
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import { StorePaySetting } from '../../entities/store_pay_setting.entity';
       PayDetail,
     ]),
   ],
-  controllers: [ReservationController],
-  providers: [ReservationService, SpaceSlotService, SpaceStatusService, PaymentIdService, LogPinoService],
+  controllers: [ReservationGuestController],
+  providers: [ReservationGuestService, SpaceSlotService, SpaceStatusService, PaymentIdService, PayReservationStatusService, LogPinoService],
 })
-export class ReservationModule {}
+export class ReservationGuestModule {}

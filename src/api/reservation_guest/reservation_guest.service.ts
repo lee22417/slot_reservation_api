@@ -2,14 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Raw, Repository } from 'typeorm';
 import { Logger } from 'nestjs-pino';
+
 import { PAY_METHOD, PAY_STATUS, RESERVATION_STATUS, SPACE_PRICE_TYPE } from '../../common/constants/enum.constants';
 import { checkValidReservationStatus } from '../../common/utils/reservation.util';
+import { combineDateTime } from '../../common/utils/date.util';
+
+import { ReservationRequestSlotDto } from './dto/reservation_request_slot.dto';
 import { ReservationRequestOptionDto } from './dto/reservation_request_option.dto';
 import { ReservationRequestDto } from './dto/reservation_request.dto';
+
 import { SpaceStatusService } from '../../common/service/space_status.service';
 import { PaymentIdService } from '../../common/service/payment_id.service';
 import { SpaceSlotService } from '../../common/service/space_slot.service';
 import { LogPinoService } from '../../common/service/log_pino.service';
+
 import { ReservationGuest } from '../../entities/reservation_guest.entity';
 import { ReservationOption } from '../../entities/reservation_option.entity';
 import { Pay } from '../../entities/pay.entity';
@@ -17,12 +23,12 @@ import { PayDetail } from '../../entities/pay_detail.entity';
 import { StorePaySetting } from '../../entities/store_pay_setting.entity';
 import { Reservation } from '../../entities/reservation.entity';
 import { SpaceOption } from '../../entities/store_space_option.entity';
-import { combineDateTime } from '../../common/utils/date.util';
-import { ReservationRequestSlotDto } from './dto/reservation_request_slot.dto';
 import { Space } from '../../entities/store_space.entity';
+import { ReservationCancelRequestSlotDto } from './dto/reservation_cancel_request.dto';
+import { PayReservationStatusService } from '../../common/service/pay_reservation_status.service';
 
 @Injectable()
-export class ReservationService {
+export class ReservationGuestService {
   constructor(
     @InjectRepository(StorePaySetting)
     private readonly paysettingRepository: Repository<StorePaySetting>,
@@ -42,9 +48,30 @@ export class ReservationService {
     private readonly spaceSlotService: SpaceSlotService,
     private readonly spaceStatusService: SpaceStatusService,
     private readonly paymentIdService: PaymentIdService,
+    private readonly payReservationStatusService: PayReservationStatusService,
     private readonly logPinoService: LogPinoService,
     private readonly logger: Logger,
   ) {}
+
+  // 특정 공간 특정 일시 임시 점유 취소 (예약 취소) (비회원)
+  async cancelReservation(reservationCancelRequestSlotDto: ReservationCancelRequestSlotDto) {
+    const guestPhone = reservationCancelRequestSlotDto.guest_phone;
+    const paymentId = reservationCancelRequestSlotDto.payment_id;
+
+    const guest = await this.guestRepository.findOneBy({ guest_phone: guestPhone, payment_id: paymentId });
+    if (!guest) {
+      return { success: false, msg: '해당 예약 조회 실패' };
+    }
+
+    // 결제 및 예약 상태 업데이트
+    return await this.payReservationStatusService.updatePayReservationStatus(
+      paymentId,
+      PAY_STATUS.PENDING,
+      PAY_STATUS.CANCELED,
+      RESERVATION_STATUS.OCCUPIED,
+      RESERVATION_STATUS.CANCELED,
+    );
+  }
 
   // 특정 공간 특정 일시 임시 점유 (예약) (비회원)
   // @LogPinoExecution({ time: false, startEnd: false, error: true, memory: true, toFile: false, logDir: 'public/logs' })
@@ -85,7 +112,7 @@ export class ReservationService {
     // this.logger.debug('priceInfo', { priceInfo: priceInfo });
 
     // 결제 정보 저장 로직
-    const payResult = await this.savePayLogic(paymentId, payMethod, options, space.space_name, priceInfo.totalPrice, priceInfo.spaceQuantity);
+    const payResult = await this.savePayLogic(spId, paymentId, payMethod, options, space.space_name, priceInfo.totalPrice, priceInfo.spaceQuantity);
     if (!payResult?.success) {
       return payResult;
     }
@@ -234,6 +261,7 @@ export class ReservationService {
 
   // 결제 정보 저장 로직
   async savePayLogic(
+    spId: number,
     paymentId: string,
     payMethod: PAY_METHOD,
     options: ReservationRequestOptionDto[] | undefined,
@@ -255,17 +283,18 @@ export class ReservationService {
     // 공간 옵션마다 pay_detail 저장
     if (options?.length) {
       for (const x of options) {
-        const spaceOption = await this.optionRepository.findOneBy({ sop_id: x.sop_id, option_status: 1 });
-        if (spaceOption) {
-          totalSpacePrice += spaceOption.option_price * x.quantity; // 총 가격 추가
-          payDetailBulk.push({
-            payment_id: paymentId,
-            item_name: spaceOption.option_name,
-            item_total_price: spaceOption.option_price * x.quantity, // 수량 고려 가격
-            item_quantity: x.quantity,
-            item_rel_table: 'reservation_option',
-          });
+        const spaceOption = await this.optionRepository.findOneBy({ sop_id: x.sop_id, sp_id: spId, option_status: 1 });
+        if (!spaceOption) {
+          return { success: false, msg: `공간 옵션 오류 [${spId} ${x.sop_id}]` };
         }
+        totalSpacePrice += spaceOption.option_price * x.quantity; // 총 가격 추가
+        payDetailBulk.push({
+          payment_id: paymentId,
+          item_name: spaceOption.option_name,
+          item_total_price: spaceOption.option_price * x.quantity, // 수량 고려 가격
+          item_quantity: x.quantity,
+          item_rel_table: 'reservation_option',
+        });
       }
     }
 

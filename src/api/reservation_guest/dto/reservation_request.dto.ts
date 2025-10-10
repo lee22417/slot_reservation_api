@@ -1,5 +1,5 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsString, IsNotEmpty, IsPhoneNumber, IsOptional, IsArray, ValidateNested, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsArray, ValidateNested, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ReservationRequestOptionDto } from './reservation_request_option.dto';
 import { PAY_METHOD } from '../../../common/constants/enum.constants';
