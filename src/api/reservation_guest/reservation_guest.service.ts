@@ -132,7 +132,7 @@ export class ReservationGuestService {
       return reservationResult;
     }
 
-    return { success: true, data: { payment_id: paymentId } };
+    return { success: true, data: { payment_id: paymentId, total_price: payResult.totalPrice } };
   }
 
   // --- 내부 함수
@@ -226,15 +226,16 @@ export class ReservationGuestService {
     const reservationsBulk: Reservation[] = [];
     for (const slot of slots) {
       for (const t of slot.times) {
-        const startDateTtime = combineDateTime(slot.date, t);
-        const endDateTime = new Date(startDateTtime);
+        const startDateTime = combineDateTime(slot.date, t);
+        const endDateTime = new Date(startDateTime);
         endDateTime.setMinutes(endDateTime.getMinutes() + intervalMinute);
+        // this.logger.debug('startDateTime', { startDateTime, t, date: slot.date });
         reservationsBulk.push(
           new Reservation({
             payment_id: paymentId,
             sp_id: spId,
             status: RESERVATION_STATUS.OCCUPIED,
-            start_datetime: startDateTtime,
+            start_datetime: startDateTime,
             end_datetime: endDateTime,
             total_people: totalPeople,
           }),
@@ -270,6 +271,7 @@ export class ReservationGuestService {
     spaceQuantity: number,
   ) {
     const payDetailBulk: Partial<PayDetail>[] = [];
+    let totalPrice = totalSpacePrice;
 
     // 공간 pay_detail 저장
     payDetailBulk.push({
@@ -287,7 +289,7 @@ export class ReservationGuestService {
         if (!spaceOption) {
           return { success: false, msg: `공간 옵션 오류 [${spId} ${x.sop_id}]` };
         }
-        totalSpacePrice += spaceOption.option_price * x.quantity; // 총 가격 추가
+        totalPrice += spaceOption.option_price * x.quantity; // 총 가격 추가
         payDetailBulk.push({
           payment_id: paymentId,
           item_name: spaceOption.option_name,
@@ -305,12 +307,12 @@ export class ReservationGuestService {
     // pay 저장
     const savedPay = await this.payRepository.save({
       payment_id: paymentId,
-      pay_total_price: totalSpacePrice,
+      pay_total_price: totalPrice,
       pay_status: PAY_STATUS.PENDING,
       pay_method: payMethod,
     });
 
-    return { success: true };
+    return { success: true, totalPrice };
   }
 
   // 공간 총 가격 계산 (인원, 시간 슬롯 고려) (옵션 제외)
