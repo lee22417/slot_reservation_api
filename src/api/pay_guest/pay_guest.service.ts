@@ -32,7 +32,7 @@ export class PayGuestService {
     }
 
     // 결제 유효한지 확인
-    const pay = await this.payRepository.findOneBy({ payment_id: paymentId, pay_method: PAY_METHOD.FREE, pay_total_price: 0 });
+    const pay = await this.payRepository.findOneBy({ payment_id: paymentId, pay_total_price: 0 });
     if (!pay) {
       return { success: false, msg: '해당 결제 조회 실패' };
     }
