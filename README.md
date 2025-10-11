@@ -28,16 +28,23 @@
 - TypeORM, GraphQL
 - Swagger, pino
 
-```
-// graphQL
-http://localhost:3000/graphql
-// swagger
-http://localhost:3000/api
-```
+---
 
-- 개선
+- url
+
+  ```
+  // graphQL
+  http://localhost:3000/graphql
+  // swagger
+  http://localhost:3000/api
+  ```
+
+- 개선 사항
   ```
   트랜젝션 (typeorm-transactional-cls-hooked)
+  ```
+- 추가 기능
+  ```
   실 결제 서비스 (inicis, kis, toss, ...)
   sms 서비스 (문자, 카카오톡)
   ```
