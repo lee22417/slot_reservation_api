@@ -29,4 +29,15 @@ export class PayGuestController {
   payFreeCancel(@Body() payRequestDto: PayRequestDto) {
     return this.payGuestService.payFreeCancel(payRequestDto);
   }
+
+  // 현금 결제시 임시 점유를 결제 대기 (비회원)
+  @Post('cash/pending')
+  @ApiOperation({
+    summary: '현금 결제시 임시 점유를 결제 대기 (비회원)',
+    description: '결제 고유 번호를 기준으로 현금 결제 임시 점유를 결제 대기 (비회원)',
+  })
+  @ApiBody({ type: PayRequestDto, description: '비회원 공간 결제 대기 요청' })
+  payCashPending(@Body() payRequestDto: PayRequestDto) {
+    return this.payGuestService.payCashPending(payRequestDto);
+  }
 }

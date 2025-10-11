@@ -60,7 +60,7 @@ type StoreHolidayModel {
   holiday_date: DateTime!
 
   """휴일 설명"""
-  holiday_description: String!
+  holiday_description: String
 
   """공지사항 생성 일자"""
   created_at: DateTime!

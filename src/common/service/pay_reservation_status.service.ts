@@ -22,12 +22,13 @@ export class PayReservationStatusService {
     currentStatus: RESERVATION_STATUS,
     newStatus: RESERVATION_STATUS,
   ) {
-    // 대기를 취소로 업데이트
+    // 결제 업데이트
     const updatedPay = await this.payRepository.update({ payment_id: paymentId, pay_status: currentPayStatus }, { pay_status: newPayStatus });
-    // 임시 점유를 취소로 업데이트
+
+    // 예약 업데이트
     const updatedReservation = await this.reservationRepository.update({ payment_id: paymentId, status: currentStatus }, { status: newStatus });
-    if (!updatedPay || !updatedReservation) {
-      return { success: false, msg: '해당 예약 취소 실패' };
+    if (!updatedPay.affected || !updatedReservation.affected) {
+      return { success: false, msg: '해당 결제 또는 예약 업데이트 실패' };
     }
 
     return { success: true };
