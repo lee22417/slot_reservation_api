@@ -3,7 +3,7 @@ import { Space } from '../../entities/store_space.entity';
 import { SpaceOption } from '../../entities/store_space_option.entity';
 import { SpaceSchedule } from '../../entities/store_space_schedule.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Raw, Repository } from 'typeorm';
+import { FindOptionsWhere, Raw, Repository } from 'typeorm';
 import { Reservation } from '../../entities/reservation.entity';
 import { RESERVATION_STATUS } from '../../common/constants/enum.constants';
 import { SpaceStatusService } from '../../common/service/space_status.service';
@@ -27,11 +27,11 @@ export class SpaceService {
 
   // 특정 공간 모든 정보 조회
   async findOneSpace(spId: number, optionStatus?: number) {
-    const data: any = { option: {}, schedule: {} };
+    const data: { info: Space | null; option; schedule } = { info: null, option: {}, schedule: {} };
     data.info = await this.spaceRepository.findOneBy({ sp_id: spId });
 
     // 공간 옵션 조회
-    const optionWhere: any = { sp_id: spId };
+    const optionWhere: FindOptionsWhere<SpaceOption> = { sp_id: spId };
     // option_status가 정의된 경우만 필터링
     if (optionStatus === 0 || optionStatus === 1) {
       optionWhere.option_status = optionStatus;

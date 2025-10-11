@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Store } from '../../entities/store.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { FindOptionsWhere, Like, Repository } from 'typeorm';
 import { StoreNotice } from '../../entities/store_notice.entity';
 import { StoreHoliday } from '../../entities/store_holiday.entity';
 import { Space } from '../../entities/store_space.entity';
@@ -24,7 +24,7 @@ export class StoreService {
 
   // 모든 상점 조회
   async findAllStore(page: number = 1, limit: number = 10, storeStatus?: number, storeName?: string) {
-    const where: any = {};
+    const where: FindOptionsWhere<Store> = {};
     if (storeName) {
       where.store_name = Like(`%${storeName}%`);
     }
@@ -45,13 +45,13 @@ export class StoreService {
 
   // 특정 상점 모든 정보 조회
   async findOneStore(stId: number, noticeIsShow?: number) {
-    const data: any = { notice: {}, holiday: {} };
+    const data: { info: Store | null; notice; holiday } = { info: null, notice: {}, holiday: {} };
 
     // -- 기본 정보 조회
     data.info = await this.storeRepository.findOneBy({ st_id: stId });
 
     // -- 공지사항 조회 (최근 생성 순으로 최대 10개 조회)
-    const noticeWhere: any = { st_id: stId };
+    const noticeWhere: FindOptionsWhere<StoreNotice> = { st_id: stId };
     // notice_is_show가 정의된 경우만 필터링
     if (noticeIsShow === 0 || noticeIsShow === 1) {
       noticeWhere.notice_is_show = noticeIsShow;
@@ -78,7 +78,7 @@ export class StoreService {
 
   // 특정 상점 모든 공간 조회
   async findAllSpace(stId: number, spaceStatus?: number) {
-    const where: any = { st_id: stId };
+    const where: FindOptionsWhere<Space> = { st_id: stId };
     if (spaceStatus === 0 || spaceStatus === 1) {
       where.space_status = spaceStatus;
     }
