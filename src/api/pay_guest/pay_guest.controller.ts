@@ -8,14 +8,25 @@ import { PayRequestDto } from './dto/pay_request.dto';
 export class PayGuestController {
   constructor(private readonly payGuestService: PayGuestService) {}
 
-  // 무료(0원)로 임시 점유 결제 (비회원)
+  // 무료(0원)로 임시 점유 결제 완료 (비회원)
   @Post('free')
   @ApiOperation({
-    summary: '무료(0원)로 임시 점유 결제 (비회원)',
-    description: '결제 고유 번호를 기준으로 무료(0원)로 임시 점유 결제 (비회원)',
+    summary: '무료(0원)로 임시 점유 결제 완료 (비회원)',
+    description: '결제 고유 번호를 기준으로 무료(0원)로 임시 점유 결제 완료 (비회원)',
   })
   @ApiBody({ type: PayRequestDto, description: '비회원 공간 결제 요청' })
-  payCompleteFree(@Body() payRequestDto: PayRequestDto) {
-    return this.payGuestService.payCompleteFree(payRequestDto);
+  payFreeComplete(@Body() payRequestDto: PayRequestDto) {
+    return this.payGuestService.payFreeComplete(payRequestDto);
+  }
+
+  // 무료(0원)로 결제 완료한 예약 취소 (비회원)
+  @Post('free/cancel')
+  @ApiOperation({
+    summary: '무료(0원)로 결제 완료한 예약 취소 (비회원)',
+    description: '결제 고유 번호를 기준으로 무료(0원)로 결제 완료한 예약 취소 (비회원)',
+  })
+  @ApiBody({ type: PayRequestDto, description: '비회원 공간 결제 취소 요청' })
+  payFreeCancel(@Body() payRequestDto: PayRequestDto) {
+    return this.payGuestService.payFreeCancel(payRequestDto);
   }
 }

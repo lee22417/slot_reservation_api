@@ -21,8 +21,8 @@ export class PayGuestService {
     private readonly payReservationStatusService: PayReservationStatusService,
   ) {}
 
-  // 특정 공간 특정 일시 임시 점유 취소 (예약 취소) (비회원)
-  async payCompleteFree(reservationCancelRequestSlotDto: PayRequestDto) {
+  // 무료(0원)로 임시 점유 결제 완료 (비회원)
+  async payFreeComplete(reservationCancelRequestSlotDto: PayRequestDto) {
     const guestPhone = reservationCancelRequestSlotDto.guest_phone;
     const paymentId = reservationCancelRequestSlotDto.payment_id;
 
@@ -44,6 +44,32 @@ export class PayGuestService {
       PAY_STATUS.COMPLETED,
       RESERVATION_STATUS.OCCUPIED,
       RESERVATION_STATUS.COMPLETED,
+    );
+  }
+
+  // 무료(0원)로 결제 완료한 예약 취소 (비회원)
+  async payFreeCancel(reservationCancelRequestSlotDto: PayRequestDto) {
+    const guestPhone = reservationCancelRequestSlotDto.guest_phone;
+    const paymentId = reservationCancelRequestSlotDto.payment_id;
+
+    const guest = await this.guestRepository.findOneBy({ guest_phone: guestPhone, payment_id: paymentId });
+    if (!guest) {
+      return { success: false, msg: '해당 예약 조회 실패' };
+    }
+
+    // 결제 유효한지 확인
+    const pay = await this.payRepository.findOneBy({ payment_id: paymentId, pay_status: PAY_STATUS.COMPLETED, pay_total_price: 0 });
+    if (!pay) {
+      return { success: false, msg: '해당 결제 조회 실패' };
+    }
+
+    // 결제 및 예약 상태 업데이트
+    return await this.payReservationStatusService.updatePayReservationStatus(
+      paymentId,
+      PAY_STATUS.COMPLETED,
+      PAY_STATUS.CANCELED,
+      RESERVATION_STATUS.COMPLETED,
+      RESERVATION_STATUS.CANCELED,
     );
   }
 }
