@@ -1,5 +1,5 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsString, IsNotEmpty, IsOptional, IsArray, ValidateNested, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsArray, ValidateNested, IsNumber, Matches, Length } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ReservationGuestRequestOptionDto } from './reservation_guest_request_option.dto';
 import { PAY_METHOD } from '../../../common/constants/enum.constants';
@@ -10,11 +10,15 @@ export class ReservationGuestRequestDto {
   @Field({ description: '비회원 이름' })
   @IsString()
   @IsNotEmpty()
+  @Length(2, 20, { message: 'guest_name은 2자리 이상 20자리 이하이어야 합니다.' })
   guest_name: string;
 
   @Field({ description: '비회원 연락처' })
   @IsString()
   @IsNotEmpty()
+  @Matches(/^\d{10,11}$/, {
+    message: 'guest_phone은 숫자 10~11자리여야 합니다.',
+  })
   guest_phone: string;
 
   @Field({ description: '결제 수단' })
