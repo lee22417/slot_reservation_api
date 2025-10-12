@@ -40,13 +40,16 @@ export class PayGuestService {
     }
 
     // 결제 및 예약 상태 업데이트
-    return await this.payReservationStatusService.updatePayReservationStatus(
+    const result = await this.payReservationStatusService.updatePayReservationStatus(
       paymentId,
       PAY_STATUS.PENDING,
       PAY_STATUS.COMPLETED,
       RESERVATION_STATUS.OCCUPIED,
       RESERVATION_STATUS.COMPLETED,
     );
+
+    // payment_id_suffix는 결제 고유 번호 뒷6자리 (예약 조회시 사용)
+    return { success: result.success, msg: result.msg, payment_id_suffix: paymentId.slice(-6) };
   }
 
   // 무료(0원)로 결제 완료한 예약 취소 (비회원)
@@ -110,7 +113,11 @@ export class PayGuestService {
       .where('r.payment_id = :paymentId', { paymentId })
       .getRawOne();
 
-    return { success: true, data: { bank_name: paysetting?.p_bank_name, bank_account: paysetting?.p_bank_account } };
+    // payment_id_suffix는 결제 고유 번호 뒷6자리 (예약 조회시 사용)
+    return {
+      success: true,
+      data: { payment_id_suffix: paymentId.slice(-6), bank_name: paysetting?.p_bank_name, bank_account: paysetting?.p_bank_account },
+    };
   }
 
   // 현금 결제 대기 취소 (비회원)
