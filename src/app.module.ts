@@ -16,6 +16,7 @@ import { GstoreModule } from './api/gql/gstore/gstore.module';
 import { GspaceModule } from './api/gql/gspace/gspace.module';
 import { LoggerModule } from 'nestjs-pino';
 import { PayGuestModule } from './api/pay_guest/pay_guest.module';
+import { GuestModule } from './api/guest/guest.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { PayGuestModule } from './api/pay_guest/pay_guest.module';
     // graphql
     GstoreModule,
     GspaceModule,
+    GuestModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

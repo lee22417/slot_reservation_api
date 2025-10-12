@@ -1,4 +1,6 @@
+import { Expose } from 'class-transformer';
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { formatDateSeoul } from '../common/utils/date.util';
 
 @Entity('store_notice')
 export class StoreNotice {
@@ -19,4 +21,10 @@ export class StoreNotice {
 
   @Column({ default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
+
+  // DB에 없는 계산 필드
+  @Expose()
+  get created_at_kst(): string {
+    return formatDateSeoul(this.created_at); // 'Asia/Seoul' KST로 변환
+  }
 }

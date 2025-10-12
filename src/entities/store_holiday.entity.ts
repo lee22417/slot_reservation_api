@@ -1,6 +1,6 @@
 import { Expose } from 'class-transformer';
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-import { formatDate } from '../common/utils/date.util';
+import { formatDate, formatDateSeoul } from '../common/utils/date.util';
 
 @Entity('store_holiday')
 export class StoreHoliday {
@@ -21,7 +21,7 @@ export class StoreHoliday {
 
   // DB에 없는 계산 필드
   @Expose()
-  get holiday_date_str(): string {
-    return formatDate(this.holiday_date);
+  get holiday_date_kst(): string {
+    return formatDateSeoul(this.holiday_date); // 'Asia/Seoul' KST로 변환
   }
 }

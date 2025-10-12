@@ -1,5 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { PAY_METHOD, PAY_STATUS } from '../common/constants/enum.constants';
+import { Expose } from 'class-transformer';
+import { formatDateSeoul } from '../common/utils/date.util';
 
 @Entity({ name: 'pay' })
 export class Pay {
@@ -35,5 +37,11 @@ export class Pay {
 
   constructor(partial?: Partial<Pay>) {
     Object.assign(this, partial);
+  }
+
+  // DB에 없는 계산 필드
+  @Expose()
+  get created_at_kst(): string {
+    return formatDateSeoul(this.created_at); // 'Asia/Seoul' KST로 변환
   }
 }

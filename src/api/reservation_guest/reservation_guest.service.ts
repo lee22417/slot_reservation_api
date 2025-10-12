@@ -268,7 +268,7 @@ export class ReservationGuestService {
     options: ReservationGuestRequestOptionDto[] | undefined,
     spaceName: string,
     totalSpacePrice: number, // 공간 총 가격 (옵션 제외)
-    spaceQuantity: number,
+    spaceQuantity: number, // 인원, 슬롯 수 고려
   ) {
     const payDetailBulk: Partial<PayDetail>[] = [];
     let totalPrice = totalSpacePrice;
@@ -278,7 +278,7 @@ export class ReservationGuestService {
       payment_id: paymentId,
       item_name: spaceName,
       item_total_price: totalSpacePrice,
-      item_quantity: spaceQuantity,
+      item_quantity: spaceQuantity, // 인원, 슬롯 수 고려
       item_rel_table: 'reservation',
     });
 

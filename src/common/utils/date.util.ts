@@ -1,15 +1,17 @@
 // date 범용 함수
 
+import moment from 'moment-timezone';
+
 export const formatDate = (date: Date): string => {
   return date.toISOString().split('T')[0]; // YYYY-MM-DD
 };
 
-export const formatTime = (date: Date): string => {
-  return date.toISOString().split('T')[1]; // HH:mm:ss
-};
-
-export const getCurrentTimestamp = (): number => {
-  return Date.now();
+// 'Asia/Seoul' KST로 변환
+export const formatDateSeoul = (date: string | Date): string => {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return moment(d)
+    .tz('Asia/Seoul') // KST로 변환
+    .format('YYYY-MM-DD HH:mm:ss');
 };
 
 // date와 time을 datetime으로 합치기

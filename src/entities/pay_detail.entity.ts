@@ -11,10 +11,10 @@ export class PayDetail {
   @Column({ nullable: false, type: 'varchar', length: 30, comment: '구매 아이템 이름' })
   item_name: string;
 
-  @Column({ nullable: false, type: 'int', comment: '구매 아이템 총 가격 (수량,인원,시간 슬롯 모두 고려)' })
+  @Column({ nullable: false, type: 'int', comment: '구매 아이템 총 가격 (수량 고려)' })
   item_total_price: number;
 
-  @Column({ nullable: false, type: 'int', default: 1, comment: '구매 아이템 수량' })
+  @Column({ nullable: false, type: 'int', default: 1, comment: '구매 아이템 수량 (인원,슬롯 수 고려)' })
   item_quantity: number;
 
   @Column({ nullable: false, type: 'varchar', length: 50, comment: 'item 연관 테이블' })
