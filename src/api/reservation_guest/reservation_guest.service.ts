@@ -7,9 +7,9 @@ import { PAY_METHOD, PAY_STATUS, RESERVATION_STATUS, SPACE_PRICE_TYPE } from '..
 import { checkValidReservationStatus } from '../../common/utils/reservation.util';
 import { combineDateTime } from '../../common/utils/date.util';
 
-import { ReservationRequestSlotDto } from './dto/reservation_request_slot.dto';
-import { ReservationRequestOptionDto } from './dto/reservation_request_option.dto';
-import { ReservationRequestDto } from './dto/reservation_request.dto';
+import { ReservationGuestRequestSlotDto } from './dto/reservation_guest_request_slot.dto';
+import { ReservationGuestRequestOptionDto } from './dto/reservation_guest_request_option.dto';
+import { ReservationGuestRequestDto } from './dto/reservation_guest_request.dto';
 
 import { SpaceStatusService } from '../../common/service/space_status.service';
 import { PaymentIdService } from '../../common/service/payment_id.service';
@@ -24,7 +24,7 @@ import { StorePaySetting } from '../../entities/store_pay_setting.entity';
 import { Reservation } from '../../entities/reservation.entity';
 import { SpaceOption } from '../../entities/store_space_option.entity';
 import { Space } from '../../entities/store_space.entity';
-import { ReservationCancelRequestSlotDto } from './dto/reservation_cancel_request.dto';
+import { ReservationGuestCancelRequestDto } from './dto/reservation_guest_cancel_request.dto';
 import { PayReservationStatusService } from '../../common/service/pay_reservation_status.service';
 
 @Injectable()
@@ -54,9 +54,9 @@ export class ReservationGuestService {
   ) {}
 
   // 특정 공간 특정 일시 임시 점유 취소 (예약 취소) (비회원)
-  async cancelReservation(reservationCancelRequestSlotDto: ReservationCancelRequestSlotDto) {
-    const guestPhone = reservationCancelRequestSlotDto.guest_phone;
-    const paymentId = reservationCancelRequestSlotDto.payment_id;
+  async cancelReservation(reservationCancelRequestDto: ReservationGuestCancelRequestDto) {
+    const guestPhone = reservationCancelRequestDto.guest_phone;
+    const paymentId = reservationCancelRequestDto.payment_id;
 
     const guest = await this.guestRepository.findOneBy({ guest_phone: guestPhone, payment_id: paymentId });
     if (!guest) {
@@ -75,13 +75,13 @@ export class ReservationGuestService {
 
   // 특정 공간 특정 일시 임시 점유 (예약) (비회원)
   // @LogPinoExecution({ time: false, startEnd: false, error: true, memory: true, toFile: false, logDir: 'public/logs' })
-  async createReservation(spId: number, reservationRequestDto: ReservationRequestDto) {
-    const guestName = reservationRequestDto.guest_name;
-    const guestPhone = reservationRequestDto.guest_phone;
-    const payMethod = reservationRequestDto.pay_method;
-    const totalPeople = reservationRequestDto.total_people;
-    const slots = reservationRequestDto.slots;
-    const options = reservationRequestDto.options;
+  async createReservation(spId: number, reservationGuestRequestDto: ReservationGuestRequestDto) {
+    const guestName = reservationGuestRequestDto.guest_name;
+    const guestPhone = reservationGuestRequestDto.guest_phone;
+    const payMethod = reservationGuestRequestDto.pay_method;
+    const totalPeople = reservationGuestRequestDto.total_people;
+    const slots = reservationGuestRequestDto.slots;
+    const options = reservationGuestRequestDto.options;
 
     // --- 예약 가능 여부 확인 로직
     // 예약 일자 운영 여부 조회
@@ -141,7 +141,7 @@ export class ReservationGuestService {
     spId: number,
     totalPeople: number,
     payMethod: PAY_METHOD,
-    slots: ReservationRequestSlotDto[],
+    slots: ReservationGuestRequestSlotDto[],
     space: Space,
   ): Promise<{ success: boolean; msg?: string }> {
     if (totalPeople < space.space_min_people || totalPeople > space.space_max_people) {
@@ -210,8 +210,8 @@ export class ReservationGuestService {
     guestPhone: string,
     totalPeople: number,
     intervalMinute: number,
-    slots: ReservationRequestSlotDto[],
-    options: ReservationRequestOptionDto[] | undefined,
+    slots: ReservationGuestRequestSlotDto[],
+    options: ReservationGuestRequestOptionDto[] | undefined,
   ) {
     // 예약한 비회원 정보 저장
     const savedGuest = await this.guestRepository.save(
@@ -265,7 +265,7 @@ export class ReservationGuestService {
     spId: number,
     paymentId: string,
     payMethod: PAY_METHOD,
-    options: ReservationRequestOptionDto[] | undefined,
+    options: ReservationGuestRequestOptionDto[] | undefined,
     spaceName: string,
     totalSpacePrice: number, // 공간 총 가격 (옵션 제외)
     spaceQuantity: number,

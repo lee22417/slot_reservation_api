@@ -2,7 +2,7 @@ import { InputType, Field, Int } from '@nestjs/graphql';
 import { IsInt, Min } from 'class-validator';
 
 @InputType()
-export class ReservationRequestOptionDto {
+export class ReservationGuestRequestOptionDto {
   @Field(() => Int, { description: '옵션 ID (sop_id)' })
   @IsInt()
   sop_id: number;

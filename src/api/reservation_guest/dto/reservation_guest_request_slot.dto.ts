@@ -2,7 +2,7 @@ import { InputType, Field, Int } from '@nestjs/graphql';
 import { IsArray, IsString } from 'class-validator';
 
 @InputType()
-export class ReservationRequestSlotDto {
+export class ReservationGuestRequestSlotDto {
   @Field(() => String, { description: '예약 일자' })
   @IsString()
   date: string;

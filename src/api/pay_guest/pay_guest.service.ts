@@ -6,9 +6,7 @@ import { PayReservationStatusService } from '../../common/service/pay_reservatio
 import { Pay } from '../../entities/pay.entity';
 import { Reservation } from '../../entities/reservation.entity';
 import { ReservationGuest } from '../../entities/reservation_guest.entity';
-import { PayRequestDto } from './dto/pay_request.dto';
-import { Space } from '../../entities/store_space.entity';
-import { StorePaySetting } from '../../entities/store_pay_setting.entity';
+import { PayGuestRequestDto } from './dto/pay_guest_request.dto';
 import { Logger } from 'nestjs-pino';
 
 @Injectable()
@@ -26,9 +24,9 @@ export class PayGuestService {
   ) {}
 
   // 무료(0원)로 임시 점유 결제 완료 (비회원)
-  async payFreeComplete(reservationCancelRequestSlotDto: PayRequestDto) {
-    const guestPhone = reservationCancelRequestSlotDto.guest_phone;
-    const paymentId = reservationCancelRequestSlotDto.payment_id;
+  async payFreeComplete(payGuestRequestDto: PayGuestRequestDto) {
+    const guestPhone = payGuestRequestDto.guest_phone;
+    const paymentId = payGuestRequestDto.payment_id;
 
     const guest = await this.guestRepository.findOneBy({ guest_phone: guestPhone, payment_id: paymentId });
     if (!guest) {
@@ -52,9 +50,9 @@ export class PayGuestService {
   }
 
   // 무료(0원)로 결제 완료한 예약 취소 (비회원)
-  async payFreeCancel(reservationCancelRequestSlotDto: PayRequestDto) {
-    const guestPhone = reservationCancelRequestSlotDto.guest_phone;
-    const paymentId = reservationCancelRequestSlotDto.payment_id;
+  async payFreeCancel(payGuestRequestDto: PayGuestRequestDto) {
+    const guestPhone = payGuestRequestDto.guest_phone;
+    const paymentId = payGuestRequestDto.payment_id;
 
     const guest = await this.guestRepository.findOneBy({ guest_phone: guestPhone, payment_id: paymentId });
     if (!guest) {
@@ -78,9 +76,9 @@ export class PayGuestService {
   }
 
   // 현금 결제시 임시 점유를 결제 대기 (비회원)
-  async payCashPending(reservationCancelRequestSlotDto: PayRequestDto) {
-    const guestPhone = reservationCancelRequestSlotDto.guest_phone;
-    const paymentId = reservationCancelRequestSlotDto.payment_id;
+  async payCashPending(payGuestRequestDto: PayGuestRequestDto) {
+    const guestPhone = payGuestRequestDto.guest_phone;
+    const paymentId = payGuestRequestDto.payment_id;
 
     const guest = await this.guestRepository.findOneBy({ guest_phone: guestPhone, payment_id: paymentId });
     if (!guest) {
@@ -116,9 +114,9 @@ export class PayGuestService {
   }
 
   // 현금 결제 대기 취소 (비회원)
-  async payCashPendingCancel(reservationCancelRequestSlotDto: PayRequestDto) {
-    const guestPhone = reservationCancelRequestSlotDto.guest_phone;
-    const paymentId = reservationCancelRequestSlotDto.payment_id;
+  async payCashPendingCancel(payGuestRequestDto: PayGuestRequestDto) {
+    const guestPhone = payGuestRequestDto.guest_phone;
+    const paymentId = payGuestRequestDto.payment_id;
 
     const guest = await this.guestRepository.findOneBy({ guest_phone: guestPhone, payment_id: paymentId });
     if (!guest) {

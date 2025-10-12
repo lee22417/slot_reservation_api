@@ -1,12 +1,12 @@
 import { InputType, Field } from '@nestjs/graphql';
 import { IsString, IsNotEmpty, IsOptional, IsArray, ValidateNested, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ReservationRequestOptionDto } from './reservation_request_option.dto';
+import { ReservationGuestRequestOptionDto } from './reservation_guest_request_option.dto';
 import { PAY_METHOD } from '../../../common/constants/enum.constants';
-import { ReservationRequestSlotDto } from './reservation_request_slot.dto';
+import { ReservationGuestRequestSlotDto } from './reservation_guest_request_slot.dto';
 
 @InputType()
-export class ReservationRequestDto {
+export class ReservationGuestRequestDto {
   @Field({ description: '비회원 이름' })
   @IsString()
   @IsNotEmpty()
@@ -27,17 +27,17 @@ export class ReservationRequestDto {
   @IsNotEmpty()
   total_people: number;
 
-  @Field(() => [ReservationRequestSlotDto], { nullable: true, description: '예약 시간 슬롯' })
+  @Field(() => [ReservationGuestRequestSlotDto], { nullable: true, description: '예약 시간 슬롯' })
   @IsNotEmpty()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => ReservationRequestSlotDto)
-  slots: ReservationRequestSlotDto[];
+  @Type(() => ReservationGuestRequestSlotDto)
+  slots: ReservationGuestRequestSlotDto[];
 
-  @Field(() => [ReservationRequestOptionDto], { nullable: true, description: '선택 옵션' })
+  @Field(() => [ReservationGuestRequestOptionDto], { nullable: true, description: '선택 옵션' })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => ReservationRequestOptionDto)
-  options?: ReservationRequestOptionDto[];
+  @Type(() => ReservationGuestRequestOptionDto)
+  options?: ReservationGuestRequestOptionDto[];
 }
