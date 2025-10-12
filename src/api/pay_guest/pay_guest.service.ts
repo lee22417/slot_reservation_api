@@ -114,4 +114,30 @@ export class PayGuestService {
 
     return { success: true, data: { bank_name: paysetting?.p_bank_name, bank_account: paysetting?.p_bank_account } };
   }
+
+  // 현금 결제 대기 취소 (비회원)
+  async payCashPendingCancel(reservationCancelRequestSlotDto: PayRequestDto) {
+    const guestPhone = reservationCancelRequestSlotDto.guest_phone;
+    const paymentId = reservationCancelRequestSlotDto.payment_id;
+
+    const guest = await this.guestRepository.findOneBy({ guest_phone: guestPhone, payment_id: paymentId });
+    if (!guest) {
+      return { success: false, msg: '해당 예약 조회 실패' };
+    }
+
+    // 결제 유효한지 확인
+    const pay = await this.payRepository.findOneBy({ payment_id: paymentId, pay_status: PAY_STATUS.PENDING, pay_method: PAY_METHOD.CASH });
+    if (!pay) {
+      return { success: false, msg: '해당 결제 조회 실패' };
+    }
+
+    // 결제 및 예약 상태 업데이트
+    return await this.payReservationStatusService.updatePayReservationStatus(
+      paymentId,
+      PAY_STATUS.PENDING,
+      PAY_STATUS.CANCELED,
+      RESERVATION_STATUS.PENDING,
+      RESERVATION_STATUS.CANCELED,
+    );
+  }
 }
