@@ -42,6 +42,7 @@
 - 개선 사항
   ```
   트랜젝션 (typeorm-transactional-cls-hooked)
+  entity - TypeORM + GraphQL 통합하기
   ```
 - 추가 기능
   ```
