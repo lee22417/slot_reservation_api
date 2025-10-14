@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Headers, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthRegisterRequestDto } from './dto/auth_register_request.dto';
 import { ApiOperation, ApiBody } from '@nestjs/swagger';
+import { JwtAuthGuard } from './jwt.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -23,8 +24,11 @@ export class AuthController {
     return this.authService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
+  // jwt token 조회
+  @UseGuards(JwtAuthGuard) // JwtAuthGuard.canActivate() 실행
+  @Get('token')
+  async checkJwtToken(@Headers('authorization') authHeader: string) {
+    const token = authHeader?.split(' ')[1];
+    return await this.authService.checkJwtToken(token);
   }
 }

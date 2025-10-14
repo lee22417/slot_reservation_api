@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthRegisterRequestDto } from './dto/auth_register_request.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -6,13 +6,18 @@ import { Logger } from 'nestjs-pino';
 import bcrypt from 'bcrypt';
 import { User } from '../../entities/user.entity';
 import { PW_SALT_ROUNDS } from '../../common/constants/app.constants';
+import { UserSession } from '../../entities/user_session.entity';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(UserSession)
+    private readonly sessionRepository: Repository<UserSession>,
 
+    private readonly jwtService: JwtService,
     private readonly logger: Logger,
   ) {}
 
@@ -48,7 +53,10 @@ export class AuthService {
     return `This action returns all auth`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+  // jwt token 조회
+  async checkJwtToken(token: string) {
+    const payload = await this.jwtService.verifyAsync(token);
+
+    return { success: true, payload: payload };
   }
 }

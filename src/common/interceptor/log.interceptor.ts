@@ -2,7 +2,7 @@ import { SetMetadata, Injectable, NestInterceptor, ExecutionContext, CallHandler
 import { Reflector } from '@nestjs/core';
 import { Observable, tap } from 'rxjs';
 
-// interceptor - http 요청 단위 전체 middleware
+// interceptor - contorller method 전/후
 
 // log 관련 공용 인터셉터 (contoller 수준)
 export type LogType = 'execution-time' | 'start-time' | 'custom';
