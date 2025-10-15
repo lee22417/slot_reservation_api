@@ -4,13 +4,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { UserSession } from '../../entities/user_session.entity';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
   constructor(
-    private readonly jwtService: JwtService,
     @InjectRepository(UserSession)
     private readonly userSessionRepository: Repository<UserSession>,
+
+    private readonly jwtService: JwtService,
+    private readonly logger: Logger,
   ) {
     super();
   }
@@ -24,6 +27,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers.authorization;
+    // this.logger.debug('canActivate authHeader', authHeader);
 
     if (!authHeader) {
       throw new UnauthorizedException('no token');
@@ -31,21 +35,17 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     const token = authHeader.split(' ')[1];
 
-    try {
-      // user_session 테이블 확인
-      const session = await this.userSessionRepository.findOneBy({ token });
-      if (!session) {
-        throw new UnauthorizedException('invalid token');
-      }
-
-      // token 만료 확인
-      if (new Date() > session.expired_at) {
-        throw new UnauthorizedException('token expired');
-      }
-
-      return true;
-    } catch (err) {
-      throw new UnauthorizedException('falid to authorize token');
+    // user_session 테이블 확인
+    const session = await this.userSessionRepository.findOneBy({ token });
+    if (!session) {
+      throw new UnauthorizedException('invalid token');
     }
+
+    // token 만료 시간 확인
+    if (new Date() > session.expired_at) {
+      throw new UnauthorizedException('token expired');
+    }
+
+    return true;
   }
 }

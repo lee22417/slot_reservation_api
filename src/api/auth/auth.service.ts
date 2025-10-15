@@ -5,9 +5,11 @@ import { Repository } from 'typeorm';
 import { Logger } from 'nestjs-pino';
 import bcrypt from 'bcrypt';
 import { User } from '../../entities/user.entity';
-import { PW_SALT_ROUNDS } from '../../common/constants/app.constants';
+import { JWT_EXPIRES_IN, JWT_EXPIRES_IN_DAYS, PW_SALT_ROUNDS } from '../../common/constants/app.constants';
 import { UserSession } from '../../entities/user_session.entity';
 import { JwtService } from '@nestjs/jwt';
+import { AuthLoginRequestDto } from './dto/auth_login_request.dto';
+import { formatDateSeoul } from '../../common/utils/date.util';
 
 @Injectable()
 export class AuthService {
@@ -21,6 +23,7 @@ export class AuthService {
     private readonly logger: Logger,
   ) {}
 
+  // 회원가입
   async register(authRegisterRequestDto: AuthRegisterRequestDto) {
     const userId = authRegisterRequestDto.user_id;
     const userPhone = authRegisterRequestDto.user_phone;
@@ -35,6 +38,7 @@ export class AuthService {
     }
 
     // 비밀번호 암호화
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     const hashedPw = await bcrypt.hash(authRegisterRequestDto.user_pw, PW_SALT_ROUNDS);
 
     // 저장
@@ -49,8 +53,38 @@ export class AuthService {
     return { success: true, user_id: saved.user_id };
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  // 로그인
+  async login(authLoginRequestDto: AuthLoginRequestDto) {
+    // 회원 조회
+    const user = await this.userRepository.findOneBy({ user_id: authLoginRequestDto.user_id });
+    if (!user) {
+      return { success: false, msg: '아이디 또는 비밀번호 불일치' };
+    }
+
+    // 비밀번호 확인
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    const isPwValid = await bcrypt.compare(authLoginRequestDto.user_pw, user.user_pw);
+    if (!isPwValid) {
+      return { success: false, msg: '아이디 또는 비밀번호 불일치' };
+    }
+
+    // jwt token 발급
+    const payload = { us_id: user.us_id, user_id: user.user_id, user_name: user.user_name };
+    const token = await this.jwtService.signAsync(payload, {
+      expiresIn: JWT_EXPIRES_IN,
+    });
+
+    const expiredAt = new Date();
+    expiredAt.setDate(expiredAt.getDate() + JWT_EXPIRES_IN_DAYS); // token 만료 시간
+
+    // jwt token DB 저장
+    const newSession = this.sessionRepository.create({
+      token: token,
+      expired_at: expiredAt,
+    });
+    await this.sessionRepository.save(newSession);
+
+    return { success: true, token: token, expired_at: expiredAt, expired_at_kst: formatDateSeoul(expiredAt) };
   }
 
   // jwt token 조회

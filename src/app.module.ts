@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -18,6 +18,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { PayGuestModule } from './api/pay_guest/pay_guest.module';
 import { GuestModule } from './api/guest/guest.module';
 import { AuthModule } from './api/auth/auth.module';
+import { JwtMiddleware } from './common/middleware/jwt.middleware';
 
 @Module({
   imports: [
@@ -83,4 +84,8 @@ import { AuthModule } from './api/auth/auth.module';
   controllers: [AppController],
   providers: [AppService, AppResolver],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(JwtMiddleware).forRoutes({ path: 'auth/token', method: RequestMethod.ALL });
+  }
+}

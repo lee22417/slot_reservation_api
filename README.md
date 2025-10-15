@@ -41,13 +41,14 @@
 
 - 개선 사항
   ```
-  트랜젝션 (typeorm-transactional-cls-hooked)
-  entity - TypeORM + GraphQL 통합하기
+  - 트랜젝션 (typeorm-transactional-cls-hooked)
+  - entity - TypeORM + GraphQL 통합하기
+  - 리턴시 throw exception
   ```
 - 추가 기능
   ```
-  실 결제 서비스 (inicis, kis, toss, ...)
-  sms 서비스 (문자, 카카오톡)
+  - 실 결제 서비스 (inicis, kis, toss, ...)
+  - sms 서비스 (문자, 카카오톡)
   ```
 
 ## Project setup
