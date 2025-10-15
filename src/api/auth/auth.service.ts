@@ -10,6 +10,7 @@ import { UserSession } from '../../entities/user_session.entity';
 import { JwtService } from '@nestjs/jwt';
 import { AuthLoginRequestDto } from './dto/auth_login_request.dto';
 import { formatDateSeoul } from '../../common/utils/date.util';
+import { JwtPayloadDto } from './dto/jwt_payload.dto';
 
 @Injectable()
 export class AuthService {
@@ -69,7 +70,7 @@ export class AuthService {
     }
 
     // jwt token 발급
-    const payload = { us_id: user.us_id, user_id: user.user_id, user_name: user.user_name };
+    const payload: JwtPayloadDto = { us_id: user.us_id, user_id: user.user_id, user_name: user.user_name };
     const token = await this.jwtService.signAsync(payload, {
       expiresIn: JWT_EXPIRES_IN,
     });
@@ -85,12 +86,5 @@ export class AuthService {
     await this.sessionRepository.save(newSession);
 
     return { success: true, token: token, expired_at: expiredAt, expired_at_kst: formatDateSeoul(expiredAt) };
-  }
-
-  // jwt token 조회
-  async checkJwtToken(token: string) {
-    const payload = await this.jwtService.verifyAsync(token);
-
-    return { success: true, payload: payload };
   }
 }

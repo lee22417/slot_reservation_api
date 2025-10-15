@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Headers, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Headers, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthRegisterRequestDto } from './dto/auth_register_request.dto';
 import { ApiOperation, ApiBody, ApiHeader } from '@nestjs/swagger';
@@ -36,8 +36,8 @@ export class AuthController {
   @Get('token')
   @ApiOperation({ summary: 'jwt token 조회', description: 'jwt token 조회' })
   @ApiHeader({ name: 'authorization', description: 'jwt token' })
-  async checkJwtToken(@Headers('authorization') authHeader: string) {
-    const token = authHeader?.split(' ')[1];
-    return await this.authService.checkJwtToken(token);
+  async checkJwtToken(@Req() req) {
+    const payload = req.user; // JwtStrategy.validate()에서 return한 값
+    return { success: true, payload: payload };
   }
 }
