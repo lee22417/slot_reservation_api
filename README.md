@@ -36,7 +36,7 @@
   // graphQL
   http://localhost:3000/graphql
   // swagger
-  http://localhost:3000/api
+  http://localhost:3000/api/docs
   ```
 
 - 개선 사항

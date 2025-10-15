@@ -3,9 +3,9 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LoggingInterceptor } from './common/interceptor/log.interceptor';
 import { Logger } from 'nestjs-pino';
+import { Swagger } from './common/provider/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -24,16 +24,11 @@ async function bootstrap() {
   // Cors
   app.enableCors();
 
-  // Swagger 설정
-  const config = new DocumentBuilder()
-    .setTitle('Slot Reservation API') // API 제목
-    .setDescription('Slot Reservation API 문서') // 설명
-    .setVersion('1.0')
-    // .addBearerAuth() // JWT 인증 사용 시
-    .build();
+  // url prefix 설정
+  // app.setGlobalPrefix('api');
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document); // http://{host}:{port}/api 로 접근 가능
+  // Swagger 설정
+  Swagger.setupSwagger(app);
 
   // interceptor
   app.useGlobalInterceptors(new LoggingInterceptor(app.get(Reflector))); // log interceptor
@@ -41,6 +36,10 @@ async function bootstrap() {
   // pino
   const logger = app.get(Logger);
   app.useLogger(logger);
+
+  // Nest - payload too large error
+  // app.use(json({ limit: '50mb' }));
+  // app.use(urlencoded({ extended: true, limit: '50mb' }));
 
   app.useStaticAssets(join(__dirname, '..', 'public'));
   // app.setBaseViewsDir(join(__dirname, '..', 'views'));
